@@ -2,8 +2,16 @@
 
 // 1. AI API Mode Handler
 async function generateAiRoast(apiKey, category, data, severity, persona) {
-  const modelName = 'gemini-1.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+  const apiKeys = apiKey.split(",").map(k => k.trim()).filter(Boolean);
+  if (!apiKeys.length) {
+    throw new Error("No Gemini API keys provided.");
+  }
+
+  const defaultModels = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-flash-latest"
+  ];
 
   let subjectDesc = '';
   if (category === 'github') {
@@ -38,42 +46,67 @@ You must adopt this persona: ${personaPrompts[persona]}
 You must scale the severity to: ${severityPrompts[severity]}
 Do not include warnings or disclaimers in the output, just output the roast directly. Keep the roast length around 2 to 4 paragraphs, concise and punchy.`;
 
-  const payload = {
-    contents: [
-      {
-        parts: [
-          {
-            text: `${systemInstruction}\n\nSubject to roast:\n${subjectDesc}`
+  const prompt = `${systemInstruction}\n\nSubject to roast:\n${subjectDesc}`;
+
+  let roastText = "";
+  let lastError = "";
+  const allErrors = [];
+
+  outer: for (const model of defaultModels) {
+    for (const key of apiKeys) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+      
+      try {
+        const response = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2048
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          lastError = errorText.length > 500 ? errorText.substring(0, 500) + '...[truncated]' : errorText;
+          allErrors.push(`[${model}] ${response.status}: ${lastError}`);
+
+          const isKeyError =
+            response.status === 429 ||
+            response.status === 403 ||
+            lastError.includes("API_KEY_INVALID") ||
+            lastError.includes("API key expired");
+
+          if (isKeyError) {
+            console.warn(`[RoastEngine] Key error (${response.status}) on model ${model}. Trying next key...`);
+            continue;
           }
-        ]
+          console.warn(`[RoastEngine] Model error (${response.status}) on model ${model}. Trying next model...`);
+          break; // Break the key loop, try next model
+        }
+
+        const data = await response.json();
+        roastText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (roastText) {
+          break outer;
+        }
+      } catch (err) {
+        lastError = err.message || err;
+        allErrors.push(`[${model}] fetch error: ${lastError}`);
+        console.warn(`[RoastEngine] Error during generation on model ${model}:`, err);
       }
-    ]
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.error?.message || `HTTP error! status: ${response.status}`);
     }
-
-    const resData = await response.json();
-    const roastText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!roastText) {
-      throw new Error('Could not parse response from Gemini API.');
-    }
-    return roastText.trim();
-  } catch (error) {
-    console.error("AI generation failed:", error);
-    throw error;
   }
+
+  if (!roastText) {
+    const tried = defaultModels.join(", ");
+    throw new Error(`Roast generation failed across models [${tried}] and ${apiKeys.length} key(s).\nAll Errors:\n${allErrors.join('\n')}`);
+  }
+
+  return roastText.trim();
 }
 
 // 2. Local Heuristics / Template Engine (Fallback & Default Mode)
