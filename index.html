@@ -3,13 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roastify | Roast as a Service (RaaS)</title>
-  <meta name="description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona.">
+  <title>Roastify | Roast as a Service (RaaS) - AI Roast Generator</title>
+  <meta name="description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona. Out-of-the-box AI mode for all.">
+  <meta name="keywords" content="roast, roast as a service, raas, github roast, resume roast, startup roast, code roast, gordon ramsay roast, ai roast generator, roastify">
+  <meta name="author" content="Roastify team">
+  <link rel="canonical" href="https://roastify.service">
+  <meta name="robots" content="index, follow">
   
-  <!-- SEO Open Graph -->
-  <meta property="og:title" content="Roastify | Roast as a Service (RaaS)">
-  <meta property="og:description" content="Savage AI-powered roasts served piping hot. Roast your GitHub, resume, startup, or code.">
+  <!-- SEO Open Graph / Facebook -->
+  <meta property="og:title" content="Roastify | Roast as a Service (RaaS) - AI Roast Generator">
+  <meta property="og:description" content="Savage AI-powered roasts served piping hot. Roast your GitHub, resume, startup, code, or custom text. Choose your cruelty level and roasting persona.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://roastify.service/">
+  <meta property="og:image" content="https://roastify.service/assets/og-image.png">
+
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://roastify.service/">
+  <meta property="twitter:title" content="Roastify | Roast as a Service (RaaS) - AI Roast Generator">
+  <meta property="twitter:description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona.">
+  <meta property="twitter:image" content="https://roastify.service/assets/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔥</text></svg>">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +37,34 @@
   
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/src/styles/style.css">
+
+  <!-- JSON-LD Structured Data Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Roastify",
+    "alternateName": "Roast as a Service",
+    "url": "https://roastify.service/",
+    "applicationCategory": "EntertainmentApplication",
+    "operatingSystem": "All",
+    "description": "Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona.",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "GitHub Profile Roaster",
+      "Resume Analyzer and Roaster",
+      "Startup Pitch Roast Teardown",
+      "Spaghetti Code Roaster",
+      "Custom Persona Selection",
+      "Cruelty Severity Levels"
+    ]
+  }
+  </script>
 </head>
 <body class="theme-spicy">
   <!-- Glowing Background Orbs -->
@@ -160,20 +204,20 @@
                 <i class="fas fa-brain-circuit"></i> AI Generation Mode
               </span>
               <label class="switch-container" aria-label="Toggle AI Generation Mode">
-                <input type="checkbox" id="ai-mode-toggle">
+                <input type="checkbox" id="ai-mode-toggle" checked>
                 <span class="switch-slider"></span>
               </label>
             </div>
             
             <div class="ai-key-input-wrapper hidden" id="ai-key-wrapper">
-              <label for="gemini-key" class="input-label mt-2">Gemini API Key</label>
+              <label for="gemini-key" class="input-label mt-2">Gemini API Key (Optional)</label>
               <div class="input-password-group">
-                <input type="password" id="gemini-key" placeholder="AIZAsy..." autocomplete="off">
+                <input type="password" id="gemini-key" placeholder="Optional custom key (AIZAsy...)" autocomplete="off">
                 <button type="button" id="toggle-key-visibility" class="key-visible-btn" aria-label="Toggle API Key Visibility">
                   <i class="fas fa-eye"></i>
                 </button>
               </div>
-              <p class="input-desc warning-desc"><i class="fas fa-lock"></i> Saved only in memory. Get a free key at Google AI Studio.</p>
+              <p class="input-desc warning-desc"><i class="fas fa-lock"></i> Optional. Overrides server config. Saved only in memory.</p>
             </div>
           </div>
 

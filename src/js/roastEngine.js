@@ -443,10 +443,43 @@ function generateLocalHeuristicRoast(category, data, severity, persona) {
   return text;
 }
 
-// 3. Exposed main function
+// 3. Backend Proxy API Fallback Handler
+async function generateBackendAiRoast(category, data, severity, persona) {
+  const url = "/api/roast";
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ category, data, severity, persona })
+  });
+
+  if (!response.ok) {
+    let errorText = "";
+    try {
+      const errJson = await response.json();
+      errorText = errJson.error || errJson.message;
+    } catch {
+      errorText = await response.text();
+    }
+    throw new Error(errorText || `Backend server returned HTTP status: ${response.status}`);
+  }
+
+  const resData = await response.json();
+  if (!resData || !resData.roast) {
+    throw new Error("Invalid response format received from backend server.");
+  }
+  return resData.roast;
+}
+
+// 4. Exposed main function
 export async function generateRoast({ category, data, severity, persona, aiMode, apiKey }) {
-  if (aiMode && apiKey) {
-    return await generateAiRoast(apiKey, category, data, severity, persona);
+  if (aiMode) {
+    if (apiKey) {
+      return await generateAiRoast(apiKey, category, data, severity, persona);
+    } else {
+      return await generateBackendAiRoast(category, data, severity, persona);
+    }
   } else {
     // Return local heuristic roast
     // Simulate a tiny delay for heuristic roast so it feels like it's "grilling"

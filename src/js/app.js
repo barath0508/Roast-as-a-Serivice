@@ -63,11 +63,17 @@ function init() {
   // Restore sound preferences
   updateSoundIcon();
   
-  // Pre-load key from Vite env if available
+  // Set default AI mode checked state
+  aiModeToggle.checked = true;
+  
+  // Pre-load key from session storage or Vite env if available
   const envKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (envKey) {
+  const savedKey = sessionStorage.getItem('gemini_api_key');
+  if (savedKey) {
+    geminiKeyInput.value = savedKey;
+    aiKeyWrapper.classList.add('visible');
+  } else if (envKey) {
     geminiKeyInput.value = envKey;
-    aiModeToggle.checked = true;
     aiKeyWrapper.classList.add('visible');
   }
   
@@ -426,11 +432,6 @@ async function handleIgniteSubmit(e) {
   const persona = personaSelect.value;
   const aiMode = aiModeToggle.checked;
   const apiKey = geminiKeyInput.value.trim() || import.meta.env.VITE_GEMINI_API_KEY || '';
-
-  if (aiMode && !apiKey) {
-    alert("Please enter a Gemini API Key or turn off AI Generation Mode to use the offline templates engine.");
-    return;
-  }
 
   if (aiMode && apiKey) {
     sessionStorage.setItem('gemini_api_key', apiKey);
