@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roastify | Roast as a Service (RaaS)</title>
+  <meta name="description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona.">
+  
+  <!-- SEO Open Graph -->
+  <meta property="og:title" content="Roastify | Roast as a Service (RaaS)">
+  <meta property="og:description" content="Savage AI-powered roasts served piping hot. Roast your GitHub, resume, startup, or code.">
+  <meta property="og:type" content="website">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/src/styles/style.css">
+</head>
+<body class="theme-spicy">
+  <!-- Glowing Background Orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo-container">
+      <div class="fire-icon-wrapper">
+        <svg class="fire-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+          <path class="flame-outer" d="M50,120 C80,120 100,90 100,60 C100,25 70,0 50,0 C30,0 0,25 0,60 C0,90 20,120 50,120 Z" />
+          <path class="flame-middle" d="M50,120 C70,120 85,98 85,75 C85,45 65,20 50,20 C35,20 15,45 15,75 C15,98 30,120 50,120 Z" />
+          <path class="flame-inner" d="M50,120 C60,120 70,105 70,90 C70,70 60,50 50,50 C40,50 30,70 30,90 C30,105 40,120 50,120 Z" />
+        </svg>
+      </div>
+      <h1>Roastify<span class="tag-raas">RaaS</span></h1>
+    </div>
+    
+    <div class="header-actions">
+      <button id="sound-toggle" class="header-btn" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
+        <i class="fas fa-volume-high"></i>
+      </button>
+      <button id="history-toggle-btn" class="header-btn" title="View Roast History" aria-label="View Roast History">
+        <i class="fas fa-history"></i>
+        <span id="history-badge" class="badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <div class="grid-layout">
+      
+      <!-- Left Column: The Grill (Inputs) -->
+      <section class="panel glass-panel dynamic-card" id="grill-panel">
+        <div class="panel-header">
+          <h2 class="panel-title"><i class="fas fa-hotdog icon-accent"></i> The Grill</h2>
+          <p class="panel-subtitle">Feed the flames. Choose your target and options.</p>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="github" id="tab-github-btn">
+            <i class="fab fa-github"></i> <span>GitHub</span>
+          </button>
+          <button class="tab-btn" data-tab="resume" id="tab-resume-btn">
+            <i class="fas fa-file-invoice"></i> <span>Resume</span>
+          </button>
+          <button class="tab-btn" data-tab="startup" id="tab-startup-btn">
+            <i class="fas fa-rocket"></i> <span>Startup</span>
+          </button>
+          <button class="tab-btn" data-tab="code" id="tab-code-btn">
+            <i class="fas fa-code"></i> <span>Code</span>
+          </button>
+          <button class="tab-btn" data-tab="custom" id="tab-custom-btn">
+            <i class="fas fa-align-left"></i> <span>Custom</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Inputs Form -->
+        <form id="roast-form" class="roast-form" onsubmit="return false;">
+          <!-- Tab Contents -->
+          <div class="tab-content active" id="tab-github">
+            <label for="github-username" class="input-label">GitHub Username</label>
+            <div class="input-group">
+              <span class="input-prefix">github.com/</span>
+              <input type="text" id="github-username" placeholder="e.g. torvalds" autocomplete="off" required>
+            </div>
+            <p class="input-desc">We'll fetch their real repos, commits, and language stats for a highly personalized burn.</p>
+          </div>
+
+          <div class="tab-content" id="tab-resume">
+            <label for="resume-text" class="input-label">Paste Your Resume Details</label>
+            <textarea id="resume-text" rows="5" placeholder="Copy/paste your career summary, job descriptions, and skills here... Make us regret reading it."></textarea>
+            <p class="input-desc">Your years of unpaid internships and buzzwords are about to get dissected.</p>
+          </div>
+
+          <div class="tab-content" id="tab-startup">
+            <label for="startup-name" class="input-label">Startup Name</label>
+            <input type="text" id="startup-name" placeholder="e.g. Uber for Cats" autocomplete="off">
+            <label for="startup-desc" class="input-label mt-3">Pitch / Description</label>
+            <textarea id="startup-desc" rows="3" placeholder="Explain your revolutionary Web3 AI-powered SaaS that solves a problem nobody has..."></textarea>
+            <p class="input-desc">No VC funding will save you from this pitch deck teardown.</p>
+          </div>
+
+          <div class="tab-content" id="tab-code">
+            <label for="code-editor" class="input-label">Paste Your Code Snippet</label>
+            <textarea id="code-editor" class="code-font" rows="6" placeholder="function spaghettiCode() {&#10;  let x = true;&#10;  if (x == true) { return x; }&#10;}"></textarea>
+            <p class="input-desc">Any programming language welcome. Prepare to have your complexity blasted.</p>
+          </div>
+
+          <div class="tab-content" id="tab-custom">
+            <label for="custom-text" class="input-label">Who/What are we roasting?</label>
+            <input type="text" id="custom-target" placeholder="e.g. My roommate, Crypto bro, etc." class="mb-3" autocomplete="off">
+            <label for="custom-text" class="input-label">Custom Details / Context</label>
+            <textarea id="custom-text" rows="4" placeholder="Tell us about their terrible fashion sense, their annoying habit, or their life choices..."></textarea>
+            <p class="input-desc">Give us the ammunition. We'll do the rest.</p>
+          </div>
+
+          <!-- Configuration Section -->
+          <div class="config-section">
+            <!-- Severity Selector -->
+            <div class="config-group">
+              <label class="input-label">Severity Level</label>
+              <div class="severity-container">
+                <input type="range" id="severity-slider" min="1" max="3" value="2" class="severity-slider">
+                <div class="severity-labels">
+                  <span class="sev-lbl active" data-val="1"><i class="fas fa-candle-holder"></i> Mild</span>
+                  <span class="sev-lbl active" data-val="2"><i class="fas fa-fire"></i> Spicy</span>
+                  <span class="sev-lbl" data-val="3"><i class="fas fa-radiation"></i> Nuclear</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Persona Selector -->
+            <div class="config-group">
+              <label for="persona-select" class="input-label">Roaster Persona</label>
+              <div class="select-wrapper">
+                <select id="persona-select" class="custom-select">
+                  <option value="gordon" selected>🔥 Gordon Ramsay (Angry Chef)</option>
+                  <option value="vc">💼 Silicon Valley VC (Tech Bro)</option>
+                  <option value="reviewer">🚫 Condescending Code Reviewer</option>
+                  <option value="shakespeare">📜 Shakespearean Insulter</option>
+                  <option value="genz">💀 Sarcastic Gen Z</option>
+                </select>
+                <div class="select-arrow"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Mode Settings -->
+          <div class="ai-toggle-section">
+            <div class="flex-row">
+              <span class="ai-lbl-text">
+                <i class="fas fa-brain-circuit"></i> AI Generation Mode
+              </span>
+              <label class="switch-container" aria-label="Toggle AI Generation Mode">
+                <input type="checkbox" id="ai-mode-toggle">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+            
+            <div class="ai-key-input-wrapper hidden" id="ai-key-wrapper">
+              <label for="gemini-key" class="input-label mt-2">Gemini API Key</label>
+              <div class="input-password-group">
+                <input type="password" id="gemini-key" placeholder="AIZAsy..." autocomplete="off">
+                <button type="button" id="toggle-key-visibility" class="key-visible-btn" aria-label="Toggle API Key Visibility">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <p class="input-desc warning-desc"><i class="fas fa-lock"></i> Saved only in memory. Get a free key at Google AI Studio.</p>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button type="submit" id="ignite-btn" class="ignite-btn">
+            <span class="btn-text"><i class="fas fa-fire-extinguisher"></i> IGNITE ROAST</span>
+            <div class="btn-glow"></div>
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Column: The Burn Ward (Output) -->
+      <section class="panel glass-panel terminal-panel" id="output-panel">
+        <!-- Terminal Header -->
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="terminal-title">raas_terminal_v1.0.3</div>
+          <div class="terminal-status" id="terminal-status-indicator">
+            <span class="status-pulse"></span> READY
+          </div>
+        </div>
+
+        <!-- Terminal Screen -->
+        <div class="terminal-body" id="terminal-screen">
+          <div class="terminal-history" id="terminal-output-text">
+            <div class="terminal-line system-line"><span class="prompt">></span> Welcome to Roastify (Roast as a Service) v1.0.3</div>
+            <div class="terminal-line system-line"><span class="prompt">></span> Waiting for subject selection... Ready to deploy emotional damage.</div>
+            <div class="terminal-line system-line"><span class="prompt">></span> Select a category, fill out the form, and hit IGNITE to burn.</div>
+          </div>
+          <div class="typing-indicator hidden" id="typing-indicator">
+            <span class="prompt">></span> <span class="loading-phase">Parsing variables...</span>
+            <span class="cursor-blink">_</span>
+          </div>
+        </div>
+
+        <!-- Heat Meter Overlay -->
+        <div class="heat-meter-container">
+          <div class="heat-meter-header">
+            <span>BURNS LEVEL</span>
+            <span id="temp-display">25°C (WARMING UP)</span>
+          </div>
+          <div class="heat-bar">
+            <div class="heat-fill" id="heat-fill-bar" style="width: 10%;"></div>
+          </div>
+        </div>
+
+        <!-- Action Panel -->
+        <div class="action-panel disabled" id="output-actions">
+          <button class="action-btn" id="copy-roast-btn" title="Copy Roast Text">
+            <i class="fas fa-copy"></i> Copy Roast
+          </button>
+          <button class="action-btn" id="save-history-btn" title="Save to History">
+            <i class="fas fa-bookmark"></i> Save Roast
+          </button>
+          <button class="action-btn share-btn" id="download-card-btn" title="Download Shareable Card">
+            <i class="fas fa-download"></i> Share Card
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Roast Card Template (hidden, used for generating download image) -->
+  <div id="roast-card-export" class="roast-card-export-hidden">
+    <div class="export-card-inner">
+      <div class="export-header">
+        <i class="fas fa-fire export-logo-fire"></i>
+        <span class="export-logo-text">ROASTIFY</span>
+        <span class="export-badge" id="export-card-badge">SPICY</span>
+      </div>
+      <div class="export-subject" id="export-card-subject">Target: GitHub/torvalds</div>
+      <div class="export-divider"></div>
+      <div class="export-roast" id="export-card-content">
+        "Your code is so messy even Git doesn't want to track your modifications."
+      </div>
+      <div class="export-footer">
+        <span class="export-persona" id="export-card-persona">By Gordon Ramsay Persona</span>
+        <span class="export-link">roastify.service</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Sidebar Drawer -->
+  <div class="history-drawer-overlay" id="history-overlay"></div>
+  <aside class="history-drawer" id="history-drawer">
+    <div class="drawer-header">
+      <h3><i class="fas fa-history"></i> Roast Vault</h3>
+      <button id="close-history-btn" class="close-btn" aria-label="Close History Panel">&times;</button>
+    </div>
+    <div class="drawer-actions">
+      <button id="clear-history-btn" class="clear-all-btn">
+        <i class="fas fa-trash-can"></i> Clear All History
+      </button>
+    </div>
+    <div class="drawer-body" id="history-list">
+      <!-- Dynamically filled with history items -->
+      <div class="history-empty">
+        <i class="fas fa-box-open empty-icon"></i>
+        <p>No emotional damage logged yet.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sound Toggle Script & Libraries -->
+  <script src="/src/js/soundManager.js" type="module"></script>
+  <script src="/src/js/roastEngine.js" type="module"></script>
+  <script src="/src/js/app.js" type="module"></script>
+</body>
+</html>
