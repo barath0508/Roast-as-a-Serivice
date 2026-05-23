@@ -1415,20 +1415,20 @@ textarea.code-font {
     flex-wrap: wrap;
   }
   .action-btn {
-    border-right: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    flex: 1 1 calc(33.33% - 1px);
+    flex: 1 1 calc(50% - 1px);
     padding: 12px 8px;
     font-size: 0.8rem;
     gap: 5px;
   }
-  .action-btn:nth-child(3) {
+  .action-btn:nth-child(2n) {
     border-right: none;
   }
-  .action-btn:last-child,
   .action-btn.comeback-btn {
     flex: 1 1 100%;
     border-bottom: none;
+    border-right: none;
   }
   .anon-banner {
     padding: 8px 1rem;

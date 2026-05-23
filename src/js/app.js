@@ -30,6 +30,7 @@ const copyRoastBtn = document.getElementById('copy-roast-btn');
 const listenRoastBtn = document.getElementById('listen-roast-btn');
 const saveHistoryBtn = document.getElementById('save-history-btn');
 const downloadCardBtn = document.getElementById('download-card-btn');
+const shareLinkBtn = document.getElementById('share-link-btn');
 const comebackBtn = document.getElementById('comeback-btn');
 
 // Stats Drawer Elements
@@ -119,6 +120,7 @@ let activeSeverity = 2; // Spicy
 let activeLanguage = localStorage.getItem('roastify_language') || 'english';
 let currentRoastText = '';
 let currentSubject = '';
+let currentRoastResult = null;
 let isSpeaking = false;
 let currentUtterance = null;
 let rouletteCancelled = false;
@@ -336,6 +338,93 @@ function init() {
     }
   }
 
+  // Parse shareable roast link parameters
+  if (params.get('share') === 'true') {
+    const t = params.get('t') || 'github';
+    const s = params.get('s') || '';
+    const sev = parseInt(params.get('sev') || '2');
+    const per = params.get('per') || 'gordon';
+    const lang = params.get('lang') || 'english';
+
+    // Set UI choices to match the parameters
+    switchTab(t);
+    activeSeverity = sev;
+    severitySlider.value = sev;
+    updateSeverityTheme(sev);
+    personaSelect.value = per;
+    updatePersonaAvatar(per);
+    activeLanguage = lang;
+    languageSelect.value = lang;
+
+    currentSubject = s;
+
+    if (t === 'battle') {
+      const r1 = base64ToUnicode(params.get('r1') || '');
+      const r2 = base64ToUnicode(params.get('r2') || '');
+      const w = params.get('w') || '';
+      const v = base64ToUnicode(params.get('v') || '');
+      const sc1 = parseInt(params.get('sc1') || '75');
+      const sc2 = parseInt(params.get('sc2') || '70');
+
+      currentRoastText = `Contestant 1 (${s.split(' vs ')[0]?.replace('battle: ', '') || 'Player 1'}) Roast:\n${r1}\n\nContestant 2 (${s.split(' vs ')[1] || 'Player 2'}) Roast:\n${r2}\n\nVERDICT:\n${v}\n\n🏆 Winner: ${w}`;
+
+      currentRoastResult = {
+        roast1: r1,
+        roast2: r2,
+        winner: w,
+        verdict: v,
+        score1: sc1,
+        score2: sc2
+      };
+
+      const name1 = s.split(' vs ')[0]?.replace('battle: ', '') || 'Player 1';
+      const name2 = s.split(' vs ')[1] || 'Player 2';
+
+      terminalOutput.innerHTML = `
+        <div class="terminal-line system-line"><span class="prompt">></span> Restored shared roast battle: [${escapeHtml(name1)} vs ${escapeHtml(name2)}]</div>
+        <div class="roast-output"><div style="font-weight: 800; color: hsl(var(--accent)); margin-bottom: 6px;">⚔️ CONTESTANT 1: ${escapeHtml(name1)} (Score: ${sc1})</div>${escapeHtml(r1)}</div>
+        <div class="roast-output"><div style="font-weight: 800; color: hsl(var(--accent)); margin-bottom: 6px;">⚔️ CONTESTANT 2: ${escapeHtml(name2)} (Score: ${sc2})</div>${escapeHtml(r2)}</div>
+        <div class="roast-output" style="border-color: var(--accent-glow);"><div style="font-weight: 800; color: #ffca28; margin-bottom: 6px;">🏆 BATTLE VERDICT: Winner is ${escapeHtml(w)}</div>${escapeHtml(v)}</div>
+      `;
+
+      showBattleScore(sc1, sc2, name1, name2, w);
+      comebackBtn.classList.add('hidden');
+    } else {
+      const r = base64ToUnicode(params.get('r') || '');
+      const sc = parseInt(params.get('sc') || '80');
+      const cr = parseInt(params.get('cr') || '75');
+      const bz = parseInt(params.get('bz') || '70');
+      const fl = parseInt(params.get('fl') || '65');
+
+      currentRoastText = r;
+      currentRoastResult = {
+        roast: r,
+        score: sc,
+        cringe: cr,
+        buzzword: bz,
+        flags: fl
+      };
+
+      terminalOutput.innerHTML = `
+        <div class="terminal-line system-line"><span class="prompt">></span> Restored shared roast: [${escapeHtml(s)}]</div>
+        <div class="roast-output">${escapeHtml(r)}</div>
+      `;
+
+      showRoastScore(sc, cr, bz, fl);
+      comebackBtn.classList.remove('hidden');
+    }
+
+    outputActions.classList.remove('disabled');
+
+    // Scroll to output panel on load after a slight delay so DOM finishes rendering
+    setTimeout(() => {
+      const outputPanel = document.getElementById('output-panel');
+      if (outputPanel) {
+        outputPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 300);
+  }
+
   // Inject Anonymous Link Generator inside Custom tab
   setupAnonymousRequestLinkGenerator();
 
@@ -368,6 +457,7 @@ function init() {
   listenRoastBtn.addEventListener('click', handleListenRoast);
   saveHistoryBtn.addEventListener('click', handleSaveRoast);
   downloadCardBtn.addEventListener('click', handleDownloadCard);
+  shareLinkBtn.addEventListener('click', handleShareLink);
   comebackBtn.addEventListener('click', handleGenerateComeback);
 
   // Stats Drawer toggles
@@ -856,6 +946,7 @@ async function handleIgniteSubmit(e) {
       aiMode: aiMode,
       apiKey: apiKey
     });
+    currentRoastResult = res;
 
     // Clean up loading loops
     clearInterval(tempInterval);
@@ -938,6 +1029,68 @@ async function handleIgniteSubmit(e) {
     // Correct heat display bar position back to the baseline theme state
     updateSeverityTheme(activeSeverity);
   }
+}
+
+// Unicode-safe Base64 encoding
+function unicodeToBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+// Unicode-safe Base64 decoding
+function base64ToUnicode(str) {
+  try {
+    return decodeURIComponent(escape(atob(str)));
+  } catch (e) {
+    console.error("Base64 decoding failed:", e);
+    return str; // Fallback to raw string
+  }
+}
+
+// Copy Shareable Link to Clipboard
+function handleShareLink() {
+  if (!currentRoastText) return;
+  soundManager.playClick();
+
+  const url = new URL(window.location.origin + window.location.pathname);
+  url.searchParams.set('share', 'true');
+  url.searchParams.set('t', activeTab);
+  url.searchParams.set('s', currentSubject);
+  url.searchParams.set('sev', activeSeverity);
+  url.searchParams.set('per', personaSelect.value);
+  url.searchParams.set('lang', activeLanguage);
+
+  if (activeTab === 'battle' && currentRoastResult) {
+    url.searchParams.set('r1', unicodeToBase64(currentRoastResult.roast1 || ''));
+    url.searchParams.set('r2', unicodeToBase64(currentRoastResult.roast2 || ''));
+    url.searchParams.set('w', currentRoastResult.winner || '');
+    url.searchParams.set('v', unicodeToBase64(currentRoastResult.verdict || ''));
+    url.searchParams.set('sc1', currentRoastResult.score1 || '0');
+    url.searchParams.set('sc2', currentRoastResult.score2 || '0');
+  } else if (currentRoastResult) {
+    url.searchParams.set('r', unicodeToBase64(currentRoastText));
+    url.searchParams.set('sc', currentRoastResult.score || '0');
+    url.searchParams.set('cr', currentRoastResult.cringe || '0');
+    url.searchParams.set('bz', currentRoastResult.buzzword || '0');
+    url.searchParams.set('fl', currentRoastResult.flags || '0');
+  } else {
+    url.searchParams.set('r', unicodeToBase64(currentRoastText));
+    url.searchParams.set('sc', '80');
+    url.searchParams.set('cr', '75');
+    url.searchParams.set('bz', '70');
+    url.searchParams.set('fl', '65');
+  }
+
+  const shareUrl = url.toString();
+
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    const origText = shareLinkBtn.innerHTML;
+    shareLinkBtn.innerHTML = '<i class="fas fa-check"></i> Link Copied!';
+    setTimeout(() => {
+      shareLinkBtn.innerHTML = origText;
+    }, 2000);
+  }).catch(err => {
+    console.error('Failed to copy share link: ', err);
+  });
 }
 
 // Copy Roast Text
