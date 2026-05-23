@@ -485,20 +485,71 @@ function init() {
   });
 
   // Initial Renderings
+  setupFaqAccordion();
+
+  // Mobile Dropdown Menu Logic
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
+
+  if (mobileMenuToggle && mobileDropdownMenu) {
+    mobileMenuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      soundManager.playClick();
+      mobileDropdownMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!mobileDropdownMenu.contains(e.target) && e.target !== mobileMenuToggle) {
+        mobileDropdownMenu.classList.add('hidden');
+      }
+    });
+
+    // Mobile button clicks forwarding to desktop buttons
+    const mobileButtonsMap = {
+      'mobile-roulette-btn': 'roulette-btn',
+      'mobile-sound-toggle': 'sound-toggle',
+      'mobile-stats-toggle-btn': 'stats-toggle-btn',
+      'mobile-leaderboard-toggle-btn': 'leaderboard-toggle-btn',
+      'mobile-achievements-toggle-btn': 'achievements-toggle-btn',
+      'mobile-history-toggle-btn': 'history-toggle-btn'
+    };
+
+    Object.entries(mobileButtonsMap).forEach(([mobileId, desktopId]) => {
+      const mobBtn = document.getElementById(mobileId);
+      const deskBtn = document.getElementById(desktopId);
+      if (mobBtn && deskBtn) {
+        mobBtn.addEventListener('click', () => {
+          mobileDropdownMenu.classList.add('hidden');
+          deskBtn.click();
+        });
+      }
+    });
+  }
+
   renderHistory();
   updateAchievementsBadge();
-  setupFaqAccordion();
 }
 
 // Sound icon updater
 function updateSoundIcon() {
   const icon = soundToggleBtn.querySelector('i');
+  const mobSoundBtn = document.getElementById('mobile-sound-toggle');
+  const mobSoundSpan = mobSoundBtn ? mobSoundBtn.querySelector('span') : null;
+
   if (soundManager.enabled) {
     icon.className = 'fas fa-volume-high';
     soundToggleBtn.style.color = '';
+    if (mobSoundSpan) {
+      mobSoundSpan.innerHTML = '<i class="fas fa-volume-high"></i> Sound Effect: On';
+      mobSoundBtn.style.color = '';
+    }
   } else {
     icon.className = 'fas fa-volume-xmark';
     soundToggleBtn.style.color = '#ef4444';
+    if (mobSoundSpan) {
+      mobSoundSpan.innerHTML = '<i class="fas fa-volume-xmark"></i> Sound Effect: Off';
+      mobSoundBtn.style.color = '#ef4444';
+    }
   }
 }
 
@@ -600,6 +651,17 @@ function renderHistory() {
     historyBadge.classList.remove('hidden');
   } else {
     historyBadge.classList.add('hidden');
+  }
+
+  // Update mobile menu history badge
+  const mobHistoryBadge = document.getElementById('mobile-history-badge');
+  if (mobHistoryBadge) {
+    mobHistoryBadge.textContent = roastHistory.length;
+    if (roastHistory.length > 0) {
+      mobHistoryBadge.classList.remove('hidden');
+    } else {
+      mobHistoryBadge.classList.add('hidden');
+    }
   }
 
   if (roastHistory.length === 0) {
@@ -1533,6 +1595,17 @@ function updateAchievementsBadge() {
     achievementsBadge.classList.remove('hidden');
   } else {
     achievementsBadge.classList.add('hidden');
+  }
+
+  // Update mobile menu achievements badge
+  const mobAchievementsBadge = document.getElementById('mobile-achievements-badge');
+  if (mobAchievementsBadge) {
+    mobAchievementsBadge.textContent = summary.unlocked;
+    if (summary.unlocked > 0) {
+      mobAchievementsBadge.classList.remove('hidden');
+    } else {
+      mobAchievementsBadge.classList.add('hidden');
+    }
   }
   
   const progressText = document.getElementById('achievements-progress-text');

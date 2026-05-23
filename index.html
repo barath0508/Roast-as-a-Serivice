@@ -159,26 +159,58 @@
     </div>
     
     <div class="header-actions">
-      <button id="roulette-btn" class="header-btn roulette-header-btn" title="Roast Roulette — Random Roast!" aria-label="Roast Roulette">
-        <i class="fas fa-dice"></i>
+      <!-- Desktop Actions -->
+      <div class="desktop-header-actions">
+        <button id="roulette-btn" class="header-btn roulette-header-btn" title="Roast Roulette — Random Roast!" aria-label="Roast Roulette">
+          <i class="fas fa-dice"></i>
+        </button>
+        <button id="sound-toggle" class="header-btn" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
+          <i class="fas fa-volume-high"></i>
+        </button>
+        <button id="stats-toggle-btn" class="header-btn" title="View Roast Statistics" aria-label="View Roast Statistics">
+          <i class="fas fa-chart-pie"></i>
+        </button>
+        <button id="leaderboard-toggle-btn" class="header-btn" title="View Hall of Shame" aria-label="View Hall of Shame">
+          <i class="fas fa-ranking-star"></i>
+        </button>
+        <button id="achievements-toggle-btn" class="header-btn" title="View Achievements" aria-label="View Achievements">
+          <i class="fas fa-trophy"></i>
+          <span id="achievements-badge" class="badge hidden">0</span>
+        </button>
+        <button id="history-toggle-btn" class="header-btn" title="View Roast History" aria-label="View Roast History">
+          <i class="fas fa-history"></i>
+          <span id="history-badge" class="badge">0</span>
+        </button>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button id="mobile-menu-toggle" class="header-btn mobile-menu-btn" title="Toggle Menu" aria-label="Toggle Menu">
+        <i class="fas fa-bars"></i>
       </button>
-      <button id="sound-toggle" class="header-btn" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
-        <i class="fas fa-volume-high"></i>
-      </button>
-      <button id="stats-toggle-btn" class="header-btn" title="View Roast Statistics" aria-label="View Roast Statistics">
-        <i class="fas fa-chart-pie"></i>
-      </button>
-      <button id="leaderboard-toggle-btn" class="header-btn" title="View Hall of Shame" aria-label="View Hall of Shame">
-        <i class="fas fa-ranking-star"></i>
-      </button>
-      <button id="achievements-toggle-btn" class="header-btn" title="View Achievements" aria-label="View Achievements">
-        <i class="fas fa-trophy"></i>
-        <span id="achievements-badge" class="badge hidden">0</span>
-      </button>
-      <button id="history-toggle-btn" class="header-btn" title="View Roast History" aria-label="View Roast History">
-        <i class="fas fa-history"></i>
-        <span id="history-badge" class="badge">0</span>
-      </button>
+
+      <!-- Mobile Dropdown Menu -->
+      <div id="mobile-dropdown-menu" class="mobile-dropdown-menu hidden">
+        <button id="mobile-roulette-btn" class="mobile-menu-item">
+          <span><i class="fas fa-dice"></i> Roast Roulette</span>
+        </button>
+        <button id="mobile-sound-toggle" class="mobile-menu-item">
+          <span><i class="fas fa-volume-high"></i> Sound Effect: On</span>
+        </button>
+        <button id="mobile-stats-toggle-btn" class="mobile-menu-item">
+          <span><i class="fas fa-chart-pie"></i> Roast Statistics</span>
+        </button>
+        <button id="mobile-leaderboard-toggle-btn" class="mobile-menu-item">
+          <span><i class="fas fa-ranking-star"></i> Hall of Shame</span>
+        </button>
+        <button id="mobile-achievements-toggle-btn" class="mobile-menu-item">
+          <span><i class="fas fa-trophy"></i> Achievement Vault</span>
+          <span id="mobile-achievements-badge" class="menu-badge hidden">0</span>
+        </button>
+        <button id="mobile-history-toggle-btn" class="mobile-menu-item">
+          <span><i class="fas fa-history"></i> Roast Vault</span>
+          <span id="mobile-history-badge" class="menu-badge hidden">0</span>
+        </button>
+      </div>
     </div>
   </header>
 
