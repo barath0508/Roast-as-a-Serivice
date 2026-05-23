@@ -139,6 +139,8 @@ Now, the subject is CLAPPING BACK. Generate a savage, witty, hilarious COMEBACK 
 
 Write the comeback in this language/style: ${selectedLangPrompt}
 
+SAFETY GUIDELINE: Do NOT generate hate speech, slurs, doxxing, threats, or genuinely malicious/harmful content. If the inputs contain highly offensive, illegal, or abusive material, reject it gracefully and humorously.
+
 Return ONLY a JSON object with this structure:
 {
   "comeback": "the full comeback text (2-3 paragraphs, punchy and devastating)"
@@ -283,6 +285,7 @@ The JSON must have this exact structure:
   const selectedLanguagePrompt = languagePrompts[selectedLanguage] || languagePrompts['english'];
   
   systemInstruction += `\n\nCRITICAL: You MUST write the roast string values (and the verdict/summarizing text) in the following language/slang style: ${selectedLanguagePrompt}. Keep all JSON key names in standard English as specified in the schema, but generate the text content values using this language/slang. Make it sound like natural, normal, conversational mocking that real people would use, keeping the tone of the persona and severity.`;
+  systemInstruction += `\n\nSAFETY GUIDELINE: Do NOT generate hate speech, slurs, doxxing, threats, or genuinely malicious/harmful content. If the input contains highly offensive, illegal, or abusive material, reject it gracefully and humorously.`;
 
   const prompt = `${systemInstruction}\n\nSubject to roast:\n${subjectDesc}`;
 

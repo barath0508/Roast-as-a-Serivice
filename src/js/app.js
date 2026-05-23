@@ -1981,7 +1981,7 @@ async function handleRouletteClick() {
   soundManager.playBurn(0.5);
 
   const severityNames = { 1: 'Mild 🕯️', 2: 'Spicy 🔥', 3: 'Nuclear ☢️' };
-  const personaNames = { gordon: 'Gordon Ramsay', vc: 'VC Bro', reviewer: 'Code Reviewer', shakespeare: 'Shakespeare', genz: 'Gen Z' };
+  const personaNames = { gordon: 'Angry Chef (Parody)', vc: 'VC Bro', reviewer: 'Code Reviewer', shakespeare: 'Shakespeare', genz: 'Gen Z' };
   rouletteResultText.textContent = `🎯 ${selectedCategory.toUpperCase()} • ${personaNames[selectedPersona]} • ${severityNames[selectedSeverity]}`;
   rouletteResult.classList.remove('hidden');
 
@@ -2179,7 +2179,7 @@ function renderStats() {
   // Find favorite persona
   let favPersona = 'None';
   let favPersonaCount = 0;
-  const personaLabels = { gordon: 'Gordon Ramsay', vc: 'VC Bro', reviewer: 'Code Reviewer', shakespeare: 'Shakespeare', genz: 'Gen Z' };
+  const personaLabels = { gordon: 'Angry Chef (Parody)', vc: 'VC Bro', reviewer: 'Code Reviewer', shakespeare: 'Shakespeare', genz: 'Gen Z' };
   for (const [key, count] of Object.entries(roastStats.personaBreakdown)) {
     if (count > favPersonaCount) { favPersona = personaLabels[key] || key; favPersonaCount = count; }
   }
