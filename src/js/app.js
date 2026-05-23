@@ -949,7 +949,7 @@ function handleDownloadCard() {
 
   ctx.fillStyle = accentColor;
   ctx.font = 'bold 13px Space Grotesk, monospace';
-  ctx.fillText('ROASTIFY.SERVICE', width - 180, height - 50);
+  ctx.fillText('ROAST-AS-A-SERIVICE.VERCEL.APP', width - 295, height - 50);
 
   // Trigger browser download
   const image = canvas.toDataURL("image/png");
