@@ -71,7 +71,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { category, data, severity, persona } = req.body;
+  const { category, data, severity, persona, language } = req.body;
   if (!category || !data || !severity || !persona) {
     return res.status(400).json({ error: "Missing required fields" });
   }
@@ -169,6 +169,25 @@ The JSON must have this exact structure:
   "flags": number (0 to 100, red flags count/severity)
 }`;
   }
+
+  const languagePrompts = {
+    english: 'English (Standard)',
+    hinglish: 'Hinglish (Hindi + English mixed). Write the roast in natural, normal, conversational Hinglish (Hindi + English mixed) with typical colloquial slang and memes (like "yaar", "chhapri", "nibba/nibbi", "paisa barbad", "alag hi level", "kya chal raha hai", "kat gaya", etc.) that people use in real life to mock each other.',
+    hindi: 'Hindi (हिन्दी) in a colloquial, conversational, normal language style. Use typical Indian slang/memes if appropriate, rather than textbook formal Hindi.',
+    tamil: 'Tamil (தமிழ் / Tanglish) in a colloquial, conversational, normal language style. Mix in colloquial Tamil words/slang and English words (Tanglish) as used in natural daily conversations.',
+    telugu: 'Telugu (తెలుగు) in a colloquial, conversational, normal language style. Mix in colloquial Telugu words/slang and English words as used in natural daily conversations.',
+    kannada: 'Kannada (ಕನ್ನಡ) in a colloquial, conversational, normal language style. Mix in colloquial Kannada words/slang and English words as used in natural daily conversations.',
+    malayalam: 'Malayalam (മലയാളം) in a colloquial, conversational, normal language style. Mix in colloquial Malayalam words/slang and English words as used in natural daily conversations.',
+    marathi: 'Marathi (मराठी) in a colloquial, conversational, normal language style. Mix in colloquial Marathi words/slang and English words as used in natural daily conversations.',
+    bengali: 'Bengali (বাংলা) in a colloquial, conversational, normal language style. Mix in colloquial Bengali words/slang and English words as used in natural daily conversations.',
+    spanish: 'Spanish (Español) in a colloquial, natural, conversational language style. Mix in casual slang if appropriate.',
+    french: 'French (Français) in a colloquial, natural, conversational language style. Mix in casual slang if appropriate.'
+  };
+
+  const selectedLanguage = language || 'english';
+  const selectedLanguagePrompt = languagePrompts[selectedLanguage] || languagePrompts['english'];
+  
+  systemInstruction += `\n\nCRITICAL: You MUST write the roast string values (and the verdict/summarizing text) in the following language/slang style: ${selectedLanguagePrompt}. Keep all JSON key names in standard English as specified in the schema, but generate the text content values using this language/slang. Make it sound like natural, normal, conversational mocking that real people would use, keeping the tone of the persona and severity.`;
 
   const prompt = `${systemInstruction}\n\nSubject to roast:\n${subjectDesc}`;
 

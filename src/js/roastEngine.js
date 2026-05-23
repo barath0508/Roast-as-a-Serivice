@@ -52,7 +52,7 @@ function recoverBattleRoast(text, target1, target2) {
 }
 
 // 1. AI API Mode Handler
-async function generateAiRoast(apiKey, category, data, severity, persona) {
+async function generateAiRoast(apiKey, category, data, severity, persona, language) {
   const apiKeys = apiKey.split(",").map(k => k.trim()).filter(Boolean);
   if (!apiKeys.length) {
     throw new Error("No Gemini API keys provided.");
@@ -141,6 +141,25 @@ The JSON must have this exact structure:
   "flags": number (0 to 100, red flags count/severity)
 }`;
   }
+
+  const languagePrompts = {
+    english: 'English (Standard)',
+    hinglish: 'Hinglish (Hindi + English mixed). Write the roast in natural, normal, conversational Hinglish (Hindi + English mixed) with typical colloquial slang and memes (like "yaar", "chhapri", "nibba/nibbi", "paisa barbad", "alag hi level", "kya chal raha hai", "kat gaya", etc.) that people use in real life to mock each other.',
+    hindi: 'Hindi (हिन्दी) in a colloquial, conversational, normal language style. Use typical Indian slang/memes if appropriate, rather than textbook formal Hindi.',
+    tamil: 'Tamil (தமிழ் / Tanglish) in a colloquial, conversational, normal language style. Mix in colloquial Tamil words/slang and English words (Tanglish) as used in natural daily conversations.',
+    telugu: 'Telugu (తెలుగు) in a colloquial, conversational, normal language style. Mix in colloquial Telugu words/slang and English words as used in natural daily conversations.',
+    kannada: 'Kannada (ಕನ್ನಡ) in a colloquial, conversational, normal language style. Mix in colloquial Kannada words/slang and English words as used in natural daily conversations.',
+    malayalam: 'Malayalam (മലയാളം) in a colloquial, conversational, normal language style. Mix in colloquial Malayalam words/slang and English words as used in natural daily conversations.',
+    marathi: 'Marathi (मराठी) in a colloquial, conversational, normal language style. Mix in colloquial Marathi words/slang and English words as used in natural daily conversations.',
+    bengali: 'Bengali (বাংলা) in a colloquial, conversational, normal language style. Mix in colloquial Bengali words/slang and English words as used in natural daily conversations.',
+    spanish: 'Spanish (Español) in a colloquial, natural, conversational language style. Mix in casual slang if appropriate.',
+    french: 'French (Français) in a colloquial, natural, conversational language style. Mix in casual slang if appropriate.'
+  };
+
+  const selectedLanguage = language || 'english';
+  const selectedLanguagePrompt = languagePrompts[selectedLanguage] || languagePrompts['english'];
+  
+  systemInstruction += `\n\nCRITICAL: You MUST write the roast string values (and the verdict/summarizing text) in the following language/slang style: ${selectedLanguagePrompt}. Keep all JSON key names in standard English as specified in the schema, but generate the text content values using this language/slang. Make it sound like natural, normal, conversational mocking that real people would use, keeping the tone of the persona and severity.`;
 
   const prompt = `${systemInstruction}\n\nSubject to roast:\n${subjectDesc}`;
 
@@ -628,14 +647,14 @@ function generateLocalHeuristicBattle(data, severity, persona) {
 }
 
 // 3. Backend Proxy API Fallback Handler
-async function generateBackendAiRoast(category, data, severity, persona) {
+async function generateBackendAiRoast(category, data, severity, persona, language) {
   const url = "/api/roast";
   const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ category, data, severity, persona })
+    body: JSON.stringify({ category, data, severity, persona, language })
   });
 
   if (!response.ok) {
@@ -653,23 +672,48 @@ async function generateBackendAiRoast(category, data, severity, persona) {
 }
 
 // 4. Exposed main function
-export async function generateRoast({ category, data, severity, persona, aiMode, apiKey }) {
+export async function generateRoast({ category, data, severity, persona, language, aiMode, apiKey }) {
   if (aiMode) {
     if (apiKey) {
-      return await generateAiRoast(apiKey, category, data, severity, persona);
+      return await generateAiRoast(apiKey, category, data, severity, persona, language);
     } else {
-      return await generateBackendAiRoast(category, data, severity, persona);
+      return await generateBackendAiRoast(category, data, severity, persona, language);
     }
   } else {
     // Return local heuristic roast
     // Simulate a tiny delay for heuristic roast so it feels like it's "grilling"
     await new Promise(resolve => setTimeout(resolve, 800));
     
+    let result;
     if (category === 'battle') {
-      return generateLocalHeuristicBattle(data, severity, persona);
+      result = generateLocalHeuristicBattle(data, severity, persona);
     } else {
-      return generateLocalHeuristicRoast(category, data, severity, persona);
+      result = generateLocalHeuristicRoast(category, data, severity, persona);
     }
+
+    if (language && language !== 'english') {
+      const langNames = {
+        hinglish: 'Hinglish',
+        hindi: 'Hindi',
+        tamil: 'Tamil',
+        telugu: 'Telugu',
+        kannada: 'Kannada',
+        malayalam: 'Malayalam',
+        marathi: 'Marathi',
+        bengali: 'Bengali',
+        spanish: 'Spanish',
+        french: 'French'
+      };
+      const langName = langNames[language] || language;
+      if (category === 'battle') {
+        result.roast1 += `\n\n[System Note: ${langName} is only supported in AI Generation Mode. Turn on AI Mode to get roasts in your native language.]`;
+        result.roast2 += `\n\n[System Note: ${langName} is only supported in AI Generation Mode. Turn on AI Mode to get roasts in your native language.]`;
+        result.verdict += `\n\n[System Note: AI Mode is required for ${langName} roasts.]`;
+      } else {
+        result.roast += `\n\n[System Note: ${langName} is only supported in AI Generation Mode. Turn on AI Mode to get roasts in your native language.]`;
+      }
+    }
+    return result;
   }
 }
 

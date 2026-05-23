@@ -10,6 +10,7 @@ const tabContents = document.querySelectorAll('.tab-content');
 const severitySlider = document.getElementById('severity-slider');
 const severityLabels = document.querySelectorAll('.sev-lbl');
 const personaSelect = document.getElementById('persona-select');
+const languageSelect = document.getElementById('language-select');
 const aiModeToggle = document.getElementById('ai-mode-toggle');
 const aiKeyWrapper = document.getElementById('ai-key-wrapper');
 const geminiKeyInput = document.getElementById('gemini-key');
@@ -98,6 +99,7 @@ const terminalPersonaAvatar = document.getElementById('terminal-persona-avatar')
 // State
 let activeTab = 'github';
 let activeSeverity = 2; // Spicy
+let activeLanguage = localStorage.getItem('roastify_language') || 'english';
 let currentRoastText = '';
 let currentSubject = '';
 let roastHistory = JSON.parse(localStorage.getItem('roastify_history') || '[]');
@@ -131,6 +133,9 @@ function init() {
   
   // Set persona avatar baseline
   updatePersonaAvatar(personaSelect.value);
+
+  // Sync language selection dropdown
+  languageSelect.value = activeLanguage;
   
   // Set default AI mode checked state
   aiModeToggle.checked = true;
@@ -307,6 +312,13 @@ function init() {
   personaSelect.addEventListener('change', () => {
     soundManager.playClick();
     updatePersonaAvatar(personaSelect.value);
+  });
+
+  // Language Selection Change
+  languageSelect.addEventListener('change', () => {
+    soundManager.playClick();
+    activeLanguage = languageSelect.value;
+    localStorage.setItem('roastify_language', activeLanguage);
   });
 
   // Form Submission
@@ -652,6 +664,7 @@ async function handleIgniteSubmit(e) {
 
   // Get configuration
   const persona = personaSelect.value;
+  const language = languageSelect.value;
   const aiMode = aiModeToggle.checked;
   const apiKey = geminiKeyInput.value.trim() || import.meta.env.VITE_GEMINI_API_KEY || '';
 
@@ -672,6 +685,7 @@ async function handleIgniteSubmit(e) {
     <div class="terminal-line system-line"><span class="prompt">></span> Selected category: ${activeTab.toUpperCase()}</div>
     <div class="terminal-line system-line"><span class="prompt">></span> Selected severity: ${activeSeverity === 1 ? 'MILD' : activeSeverity === 2 ? 'SPICY' : 'NUCLEAR'}</div>
     <div class="terminal-line system-line"><span class="prompt">></span> Selected persona: ${persona.toUpperCase()}</div>
+    <div class="terminal-line system-line"><span class="prompt">></span> Selected language: ${language.toUpperCase()}</div>
   `;
 
   // Start Heat / Temperature Animation
@@ -773,6 +787,7 @@ async function handleIgniteSubmit(e) {
       data: payloadData,
       severity: activeSeverity.toString(),
       persona: persona,
+      language: language,
       aiMode: aiMode,
       apiKey: apiKey
     });

@@ -485,7 +485,7 @@ textarea.code-font {
 /* Config Section inside Form */
 .config-section {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr;
   gap: 1.5rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
