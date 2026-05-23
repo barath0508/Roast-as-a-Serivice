@@ -196,6 +196,7 @@ h1, h2, h3, h4 {
   border-radius: 4px;
   background: rgba(hsl(var(--accent)), 0.1);
   color: hsl(var(--accent));
+  -webkit-text-fill-color: hsl(var(--accent));
   font-weight: bold;
   letter-spacing: 0.1em;
   text-shadow: 0 0 10px rgba(hsl(var(--accent)), 0.3);
@@ -1446,6 +1447,101 @@ textarea.code-font {
   color: #ffffff;
   width: 32px;
   text-align: right;
+}
+
+.battle-score-panel {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1.2rem;
+  padding: 1.2rem 1.8rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  align-items: center;
+  animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.battle-score-player {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.battle-score-player h5 {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.battle-score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.battle-score-num {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.battle-score-lbl {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.battle-score-bar-container {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.battle-score-bar {
+  height: 100%;
+  border-radius: 3px;
+  background: hsl(var(--accent));
+  box-shadow: 0 0 10px rgba(hsl(var(--accent)), 0.5);
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.battle-score-vs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.battle-score-vs .vs-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.battle-winner-badge {
+  color: #ffca28;
+  font-size: 0.95rem;
+  filter: drop-shadow(0 0 6px rgba(255, 202, 40, 0.5));
+  animation: bounce 2s infinite alternate;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
 }
 
 /* 2. Roast Battle UI styling */

@@ -77,11 +77,22 @@ const metricBuzzwordVal = document.getElementById('metric-buzzword-val');
 const metricFlagsFill = document.getElementById('metric-flags-fill');
 const metricFlagsVal = document.getElementById('metric-flags-val');
 
+// Battle Score Panel
+const battleScorePanel = document.getElementById('battle-score-panel');
+const battlePlayer1Name = document.getElementById('battle-player1-name');
+const battlePlayer1Score = document.getElementById('battle-player1-score');
+const battlePlayer1Bar = document.getElementById('battle-player1-bar');
+const battlePlayer2Name = document.getElementById('battle-player2-name');
+const battlePlayer2Score = document.getElementById('battle-player2-score');
+const battlePlayer2Bar = document.getElementById('battle-player2-bar');
+const battleWinnerBadge = document.getElementById('battle-winner-badge');
+
 // Anonymous Banner
 const anonBanner = document.getElementById('anon-banner');
 
 // Sound Toggle Header Button
 const soundToggleBtn = document.getElementById('sound-toggle');
+const terminalPersonaAvatar = document.getElementById('terminal-persona-avatar');
 
 // State
 let activeTab = 'github';
@@ -116,6 +127,9 @@ const LOADING_MESSAGES = [
 function init() {
   // Restore sound preferences
   updateSoundIcon();
+  
+  // Set persona avatar baseline
+  updatePersonaAvatar(personaSelect.value);
   
   // Set default AI mode checked state
   aiModeToggle.checked = true;
@@ -288,6 +302,12 @@ function init() {
     updateAchievementsBadge();
   });
 
+  // Persona Selection Change
+  personaSelect.addEventListener('change', () => {
+    soundManager.playClick();
+    updatePersonaAvatar(personaSelect.value);
+  });
+
   // Form Submission
   roastForm.addEventListener('submit', handleIgniteSubmit);
 
@@ -312,6 +332,26 @@ function updateSoundIcon() {
     icon.className = 'fas fa-volume-xmark';
     soundToggleBtn.style.color = '#ef4444';
   }
+}
+
+// Persona avatar updater
+function updatePersonaAvatar(persona) {
+  if (!terminalPersonaAvatar) return;
+  
+  let avatar = '👨‍🍳';
+  if (persona === 'gordon') avatar = '👨‍🍳';
+  else if (persona === 'vc') avatar = '💼';
+  else if (persona === 'reviewer') avatar = '🧐';
+  else if (persona === 'shakespeare') avatar = '📜';
+  else if (persona === 'genz') avatar = '💀';
+  
+  terminalPersonaAvatar.textContent = avatar;
+  
+  // Add a nice rotation effect on change
+  terminalPersonaAvatar.style.transform = 'rotate(360deg) scale(1.2)';
+  setTimeout(() => {
+    terminalPersonaAvatar.style.transform = '';
+  }, 300);
 }
 
 // Tab switcher logic
@@ -590,6 +630,7 @@ async function handleIgniteSubmit(e) {
   // Reset actions buttons & hide score panel
   outputActions.classList.add('disabled');
   roastScorePanel.classList.add('hidden');
+  battleScorePanel.classList.add('hidden');
   currentRoastText = '';
 
   // Get configuration
@@ -732,6 +773,11 @@ async function handleIgniteSubmit(e) {
 
       // Track battle achievements
       trackProgress('BATTLE_VETERAN', 1);
+
+      // Show Battle Score Panel
+      const contestant1 = currentSubject.split(' vs ')[0].replace('battle: ', '');
+      const contestant2 = currentSubject.split(' vs ')[1];
+      showBattleScore(res.score1 || 75, res.score2 || 70, contestant1, contestant2, res.winner);
     } else {
       currentRoastText = res.roast;
       
@@ -1127,6 +1173,70 @@ function showRoastScore(score, cringe, buzzword, flags) {
   
   metricFlagsFill.style.width = `${flags}%`;
   metricFlagsVal.textContent = `${flags}%`;
+}
+
+function showBattleScore(score1, score2, name1, name2, winnerName) {
+  battleScorePanel.classList.remove('hidden');
+  
+  battlePlayer1Name.textContent = name1;
+  battlePlayer2Name.textContent = name2;
+  
+  // Animate score 1
+  let count1 = 0;
+  battlePlayer1Score.textContent = 0;
+  battlePlayer1Bar.style.width = '0%';
+  
+  const interval1 = setInterval(() => {
+    if (count1 >= score1) {
+      battlePlayer1Score.textContent = score1;
+      battlePlayer1Bar.style.width = `${score1}%`;
+      clearInterval(interval1);
+    } else {
+      count1++;
+      battlePlayer1Score.textContent = count1;
+    }
+  }, 10);
+  
+  // Animate score 2
+  let count2 = 0;
+  battlePlayer2Score.textContent = 0;
+  battlePlayer2Bar.style.width = '0%';
+  
+  const interval2 = setInterval(() => {
+    if (count2 >= score2) {
+      battlePlayer2Score.textContent = score2;
+      battlePlayer2Bar.style.width = `${score2}%`;
+      clearInterval(interval2);
+    } else {
+      count2++;
+      battlePlayer2Score.textContent = count2;
+    }
+  }, 10);
+  
+  // Winner crown badge show
+  if (battleWinnerBadge) {
+    battleWinnerBadge.classList.remove('hidden');
+  }
+  
+  // Highlight winner player panel
+  const p1Panel = document.querySelector('.battle-score-player.player1');
+  const p2Panel = document.querySelector('.battle-score-player.player2');
+  if (p1Panel && p2Panel) {
+    p1Panel.style.border = '';
+    p2Panel.style.border = '';
+    p1Panel.style.boxShadow = '';
+    p2Panel.style.boxShadow = '';
+    
+    setTimeout(() => {
+      if (winnerName && winnerName.toLowerCase().trim() === name1.toLowerCase().trim()) {
+        p1Panel.style.border = '1px solid #ffca28';
+        p1Panel.style.boxShadow = '0 0 15px rgba(255, 202, 40, 0.15)';
+      } else if (winnerName && winnerName.toLowerCase().trim() === name2.toLowerCase().trim()) {
+        p2Panel.style.border = '1px solid #ffca28';
+        p2Panel.style.boxShadow = '0 0 15px rgba(255, 202, 40, 0.15)';
+      }
+    }, 1000);
+  }
 }
 
 function toggleAchievementsDrawer(open) {

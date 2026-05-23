@@ -346,7 +346,7 @@
             <span class="dot dot-yellow"></span>
             <span class="dot dot-green"></span>
           </div>
-          <div class="terminal-title">raas_terminal_v1.0.3</div>
+          <div class="terminal-title"><span id="terminal-persona-avatar" style="margin-right: 6px; font-size: 1rem; filter: drop-shadow(0 0 4px var(--accent-glow)); transition: transform 0.3s ease;">👨‍🍳</span>raas_terminal_v1.0.3</div>
           <div class="terminal-status" id="terminal-status-indicator">
             <span class="status-pulse"></span> READY
           </div>
@@ -406,6 +406,35 @@
               <span class="metric-label">Red Flags</span>
               <div class="metric-bar-bg"><div id="metric-flags-fill" class="metric-bar-fill flags-color" style="width: 0%;"></div></div>
               <span id="metric-flags-val" class="metric-val">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="battle-score-panel" class="battle-score-panel hidden">
+          <div class="battle-score-player player1">
+            <h5 id="battle-player1-name">Contestant 1</h5>
+            <div class="battle-score-display">
+              <span id="battle-player1-score" class="battle-score-num">0</span>
+              <span class="battle-score-lbl">ROAST SCORE</span>
+            </div>
+            <div class="battle-score-bar-container">
+              <div id="battle-player1-bar" class="battle-score-bar" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="battle-score-vs">
+            <span class="vs-text">VS</span>
+            <div id="battle-winner-badge" class="battle-winner-badge hidden"><i class="fas fa-crown"></i></div>
+          </div>
+
+          <div class="battle-score-player player2">
+            <h5 id="battle-player2-name">Contestant 2</h5>
+            <div class="battle-score-display">
+              <span id="battle-player2-score" class="battle-score-num">0</span>
+              <span class="battle-score-lbl">ROAST SCORE</span>
+            </div>
+            <div class="battle-score-bar-container">
+              <div id="battle-player2-bar" class="battle-score-bar" style="width: 0%"></div>
             </div>
           </div>
         </div>
