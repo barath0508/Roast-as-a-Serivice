@@ -1,6 +1,31 @@
 // api/roast.js
 // Node.js Serverless Function for Vercel
 
+function recoverStringValue(text, key) {
+  const keyStr = `"${key}"`;
+  const keyIdx = text.indexOf(keyStr);
+  if (keyIdx === -1) return null;
+  
+  const colonIdx = text.indexOf(':', keyIdx + keyStr.length);
+  if (colonIdx === -1) return null;
+  
+  const startQuoteIdx = text.indexOf('"', colonIdx + 1);
+  if (startQuoteIdx === -1) return null;
+  
+  let endQuoteIdx = text.length;
+  for (let i = text.length - 1; i > startQuoteIdx; i--) {
+    if (text[i] === '"') {
+      const remainder = text.substring(i + 1).trim();
+      if (remainder === '' || remainder === ',' || remainder === '}' || remainder === ',}' || remainder === '}') {
+        endQuoteIdx = i;
+        break;
+      }
+    }
+  }
+  
+  return text.substring(startQuoteIdx + 1, endQuoteIdx).trim();
+}
+
 function tryParseJson(text) {
   let cleanText = text.trim();
   if (cleanText.startsWith("```")) {
@@ -12,7 +37,54 @@ function tryParseJson(text) {
   try {
     return JSON.parse(cleanText);
   } catch (err) {
-    console.error("JSON parsing failed on server:", err);
+    console.error("JSON parsing failed, attempting recovery:", err);
+    
+    // Check standard roast
+    if (cleanText.includes('"roast"')) {
+      const roastVal = recoverStringValue(cleanText, "roast");
+      if (roastVal) {
+        const scoreMatch = cleanText.match(/"score"\s*:\s*(\d+)/);
+        const cringeMatch = cleanText.match(/"cringe"\s*:\s*(\d+)/);
+        const buzzwordMatch = cleanText.match(/"buzzword"\s*:\s*(\d+)/);
+        const flagsMatch = cleanText.match(/"flags"\s*:\s*(\d+)/);
+        return {
+          roast: roastVal,
+          score: scoreMatch ? parseInt(scoreMatch[1]) : 75,
+          cringe: cringeMatch ? parseInt(cringeMatch[1]) : 70,
+          buzzword: buzzwordMatch ? parseInt(buzzwordMatch[1]) : 65,
+          flags: flagsMatch ? parseInt(flagsMatch[1]) : 60
+        };
+      }
+    }
+    
+    // Check battle roast
+    if (cleanText.includes('"roast1"') || cleanText.includes('"roast2"')) {
+      const r1Val = recoverStringValue(cleanText, "roast1");
+      const r2Val = recoverStringValue(cleanText, "roast2");
+      const winnerMatch = cleanText.match(/"winner"\s*:\s*"([\s\S]*?)"/);
+      const verdictVal = recoverStringValue(cleanText, "verdict");
+      const sc1Match = cleanText.match(/"score1"\s*:\s*(\d+)/);
+      const sc2Match = cleanText.match(/"score2"\s*:\s*(\d+)/);
+      return {
+        roast1: r1Val || '',
+        roast2: r2Val || '',
+        winner: winnerMatch ? winnerMatch[1] : 'Target A',
+        verdict: verdictVal || '',
+        score1: sc1Match ? parseInt(sc1Match[1]) : 80,
+        score2: sc2Match ? parseInt(sc2Match[1]) : 70
+      };
+    }
+
+    // Check comeback format
+    if (cleanText.includes('"comeback"')) {
+      const comebackVal = recoverStringValue(cleanText, "comeback");
+      if (comebackVal) {
+        return {
+          comeback: comebackVal
+        };
+      }
+    }
+    
     return null;
   }
 }
