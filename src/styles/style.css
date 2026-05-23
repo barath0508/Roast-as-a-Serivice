@@ -570,6 +570,11 @@ textarea.code-font {
   padding-right: 40px;
 }
 
+.custom-select option {
+  background-color: #0f111a;
+  color: var(--text-main);
+}
+
 .select-arrow {
   position: absolute;
   top: 50%;
@@ -724,6 +729,7 @@ textarea.code-font {
   transition: all var(--transition-fast);
   box-shadow: 0 10px 25px rgba(hsl(var(--accent)), 0.35);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .btn-text {
