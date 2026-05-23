@@ -74,6 +74,12 @@ const leaderboardDrawer = document.getElementById('leaderboard-drawer');
 const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
 const leaderboardList = document.getElementById('leaderboard-list');
 
+// Policy & Disclaimer Elements
+const infoModal = document.getElementById('info-modal');
+const infoModalTitle = document.getElementById('info-modal-title');
+const infoModalBody = document.getElementById('info-modal-body');
+const infoModalClose = document.getElementById('info-modal-close');
+
 // Battle Fields
 const battleGithubFields = document.querySelectorAll('.battle-github-fields');
 const battleCustomFields = document.querySelectorAll('.battle-custom-fields');
@@ -180,11 +186,11 @@ function init() {
   // Pre-load key from session storage or Vite env if available
   const envKey = import.meta.env.VITE_GEMINI_API_KEY;
   const savedKey = sessionStorage.getItem('gemini_api_key');
-  if (savedKey) {
+  if (savedKey && geminiKeyInput && aiKeyWrapper) {
     geminiKeyInput.value = savedKey;
     aiKeyWrapper.classList.add('visible');
     aiKeyWrapper.classList.remove('hidden');
-  } else if (envKey) {
+  } else if (envKey && geminiKeyInput && aiKeyWrapper) {
     geminiKeyInput.value = envKey;
     aiKeyWrapper.classList.add('visible');
     aiKeyWrapper.classList.remove('hidden');
@@ -242,25 +248,32 @@ function init() {
   aiModeToggle.addEventListener('change', (e) => {
     soundManager.playClick();
     if (e.target.checked) {
-      aiKeyWrapper.classList.add('visible');
-      aiKeyWrapper.classList.remove('hidden');
-      // Load saved key if exists in session storage
-      geminiKeyInput.value = sessionStorage.getItem('gemini_api_key') || '';
+      if (aiKeyWrapper) {
+        aiKeyWrapper.classList.add('visible');
+        aiKeyWrapper.classList.remove('hidden');
+      }
+      if (geminiKeyInput) {
+        geminiKeyInput.value = sessionStorage.getItem('gemini_api_key') || '';
+      }
     } else {
-      aiKeyWrapper.classList.remove('visible');
-      aiKeyWrapper.classList.add('hidden');
+      if (aiKeyWrapper) {
+        aiKeyWrapper.classList.remove('visible');
+        aiKeyWrapper.classList.add('hidden');
+      }
     }
   });
 
-  // API Key visiblity toggle
-  toggleKeyVisibilityBtn.addEventListener('click', () => {
-    soundManager.playClick();
-    const type = geminiKeyInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    geminiKeyInput.setAttribute('type', type);
-    const icon = toggleKeyVisibilityBtn.querySelector('i');
-    icon.classList.toggle('fa-eye');
-    icon.classList.toggle('fa-eye-slash');
-  });
+  // API Key visibility toggle
+  if (toggleKeyVisibilityBtn && geminiKeyInput) {
+    toggleKeyVisibilityBtn.addEventListener('click', () => {
+      soundManager.playClick();
+      const type = geminiKeyInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      geminiKeyInput.setAttribute('type', type);
+      const icon = toggleKeyVisibilityBtn.querySelector('i');
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    });
+  }
 
   // History Drawer toggles
   historyToggleBtn.addEventListener('click', () => {
@@ -522,6 +535,41 @@ function init() {
           mobileDropdownMenu.classList.add('hidden');
           deskBtn.click();
         });
+      }
+    });
+  }
+
+  // Policy & Disclaimer triggers
+  const policyTriggers = document.querySelectorAll('.policy-link-trigger');
+  const disclaimerTriggers = document.querySelectorAll('.disclaimer-link-trigger');
+
+  policyTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      soundManager.playClick();
+      openInfoModal('policy');
+    });
+  });
+
+  disclaimerTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      soundManager.playClick();
+      openInfoModal('disclaimer');
+    });
+  });
+
+  if (infoModalClose) {
+    infoModalClose.addEventListener('click', () => {
+      soundManager.playClick();
+      closeInfoModal();
+    });
+  }
+
+  if (infoModal) {
+    infoModal.addEventListener('click', (e) => {
+      if (e.target === infoModal) {
+        closeInfoModal();
       }
     });
   }
@@ -883,9 +931,9 @@ async function handleIgniteSubmit(e) {
   const persona = personaSelect.value;
   const language = languageSelect.value;
   const aiMode = aiModeToggle.checked;
-  const apiKey = geminiKeyInput.value.trim() || import.meta.env.VITE_GEMINI_API_KEY || '';
+  const apiKey = (geminiKeyInput ? geminiKeyInput.value.trim() : '') || import.meta.env.VITE_GEMINI_API_KEY || '';
 
-  if (aiMode && apiKey) {
+  if (aiMode && apiKey && geminiKeyInput) {
     sessionStorage.setItem('gemini_api_key', apiKey);
   }
 
@@ -1899,6 +1947,69 @@ function fillRoulettePlaceholder(category) {
 }
 
 // ==========================================================================
+// Policy & Disclaimer Modal Logic
+// ==========================================================================
+const POLICY_CONTENT = `
+  <p>At <strong>Roastify</strong>, we are committed to protecting your privacy while delivering maximum emotional damage. This Privacy Policy details how we handle data.</p>
+  
+  <h4><i class="fas fa-shield-alt"></i> 1. Zero Server-Side Logging</h4>
+  <p>We do not store your inputs, resume files, GitHub usernames, or generated roasts on any database server. All roast generations are processed dynamically and state history is saved strictly in your browser's <strong>Local Storage</strong>.</p>
+  
+  <h4><i class="fas fa-key"></i> 2. API Key and Model Usage</h4>
+  <p>All AI generation is processed securely on our server backend. We do not prompt you for, collect, or store any personal AI API keys, ensuring maximum safety and preventing key exposure.</p>
+  
+  <h4><i class="fas fa-cookie-bite"></i> 3. Local Storage Usage</h4>
+  <p>We use Local Storage to store:
+    <ul>
+      <li>Your generated roast history.</li>
+      <li>Achievements and score statistics.</li>
+      <li>Your preference settings (Persona, Severity level, Sound options, Language).</li>
+    </ul>
+    You can clear all of this data at any time using the "Clear History" or "Reset Achievements" buttons.
+  </p>
+  
+  <h4><i class="fas fa-user-lock"></i> 4. Age Restriction</h4>
+  <p>Roastify is intended for audiences who can take a joke. If you have extremely thin skin or are under the age of 13, you might find the generated output offensive. Proceed with caution.</p>
+`;
+
+const DISCLAIMER_CONTENT = `
+  <p>Please read this disclaimer carefully before using <strong>Roastify</strong>. Your ego depends on it.</p>
+  
+  <h4><i class="fas fa-laugh"></i> 1. Strictly Entertainment</h4>
+  <p>All content generated by Roastify (including ratings, cringe indices, buzzword alerts, and roast texts) is generated by artificial intelligence and is intended <strong>strictly for comedic, satirical, and entertainment purposes</strong>.</p>
+  
+  <h4><i class="fas fa-exclamation-triangle"></i> 2. No Real Malice or Harassment</h4>
+  <p>Roastify is built to grill code, startup ideas, and public profiles in a lighthearted, roast-comedy format. It is <strong>not</strong> designed or intended to be used for genuine harassment, abuse, cyberbullying, defamation, or targeting of individuals. Please play nice and use it in a spirit of good fun.</p>
+  
+  <h4><i class="fas fa-brain"></i> 3. AI Hallucination & Accuracy</h4>
+  <p>The AI reviews inputs and generates humorous fabrications. The ratings, flags, and scores are fictional, subjective, and do not represent reality, factual statements, or the views of Roastify's developers.</p>
+  
+  <h4><i class="fas fa-heart-crack"></i> 4. Limitation of Liability</h4>
+  <p>Under no circumstances shall Roastify, its developers, or affiliates be held liable for any emotional burns, psychological distress, ego deflations, broken friendships, or career changes resulting from generated roast content. You use this service at your own risk. If you cannot take a joke, please close the tab.</p>
+`;
+
+function openInfoModal(type) {
+  if (!infoModal || !infoModalTitle || !infoModalBody) return;
+  
+  if (type === 'policy') {
+    infoModalTitle.innerHTML = '<i class="fas fa-user-shield"></i> Privacy Policy';
+    infoModalBody.innerHTML = POLICY_CONTENT;
+  } else if (type === 'disclaimer') {
+    infoModalTitle.innerHTML = '<i class="fas fa-balance-scale"></i> Disclaimer';
+    infoModalBody.innerHTML = DISCLAIMER_CONTENT;
+  }
+  
+  infoModal.classList.remove('hidden');
+  body.style.overflow = 'hidden';
+}
+
+function closeInfoModal() {
+  if (!infoModal) return;
+  infoModal.classList.add('hidden');
+  body.style.overflow = '';
+}
+
+// ==========================================================================
 // FEATURE 3: Statistics Dashboard
 // ==========================================================================
 function toggleStatsDrawer(open) {
@@ -2070,7 +2181,7 @@ async function handleGenerateComeback() {
   const persona = personaSelect.value;
   const language = languageSelect.value;
   const aiMode = aiModeToggle.checked;
-  const apiKey = geminiKeyInput.value.trim() || import.meta.env.VITE_GEMINI_API_KEY || '';
+  const apiKey = (geminiKeyInput ? geminiKeyInput.value.trim() : '') || import.meta.env.VITE_GEMINI_API_KEY || '';
 
   // Show loading in terminal
   const loadingDiv = document.createElement('div');
