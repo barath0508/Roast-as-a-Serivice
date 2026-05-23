@@ -1489,6 +1489,138 @@ function setupFaqAccordion() {
   });
 }
 
+// ==========================================================================
+// FEATURE 1: Text-to-Speech Roast Playback
+// ==========================================================================
+function handleListenRoast() {
+  if (!currentRoastText) return;
+  soundManager.playClick();
+
+  if (isSpeaking) {
+    window.speechSynthesis.cancel();
+    isSpeaking = false;
+    listenRoastBtn.classList.remove('speaking');
+    listenRoastBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(currentRoastText);
+  currentUtterance = utterance;
+
+  // Persona voice configurations
+  const persona = personaSelect.value;
+  const voiceConfigs = {
+    gordon:     { pitch: 0.8,  rate: 1.15, volume: 1    },
+    vc:         { pitch: 1.0,  rate: 0.95, volume: 0.9  },
+    reviewer:   { pitch: 0.9,  rate: 0.85, volume: 0.85 },
+    shakespeare:{ pitch: 0.7,  rate: 0.75, volume: 1    },
+    genz:       { pitch: 1.3,  rate: 1.25, volume: 0.95 }
+  };
+  const config = voiceConfigs[persona] || voiceConfigs.gordon;
+  utterance.pitch  = config.pitch;
+  utterance.rate   = config.rate;
+  utterance.volume = config.volume;
+
+  // Try to match a voice to the selected language
+  const langMap = {
+    english: 'en', hinglish: 'hi', hindi: 'hi',
+    tamil: 'ta', telugu: 'te', kannada: 'kn',
+    malayalam: 'ml', marathi: 'mr', bengali: 'bn',
+    spanish: 'es', french: 'fr'
+  };
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length > 0) {
+    const langCode = langMap[activeLanguage] || 'en';
+    const matched = voices.find(v => v.lang.startsWith(langCode))
+                 || voices.find(v => v.lang.startsWith('en'));
+    if (matched) utterance.voice = matched;
+  }
+
+  utterance.onstart = () => {
+    isSpeaking = true;
+    listenRoastBtn.classList.add('speaking');
+    listenRoastBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+  };
+  utterance.onend = utterance.onerror = () => {
+    isSpeaking = false;
+    listenRoastBtn.classList.remove('speaking');
+    listenRoastBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// ==========================================================================
+// FEATURE 2: Roast Roulette
+// ==========================================================================
+async function handleRouletteClick() {
+  rouletteCancelled = false;
+  rouletteOverlay.classList.remove('hidden');
+  rouletteResult.classList.add('hidden');
+
+  const categories = ['github', 'resume', 'startup', 'code', 'custom'];
+  const personas = ['gordon', 'vc', 'reviewer', 'shakespeare', 'genz'];
+  const severities = [1, 2, 3];
+
+  const segments = rouletteWheel.querySelectorAll('.roulette-segment');
+  segments.forEach(s => s.classList.remove('selected'));
+
+  const spinDuration = 2000;
+  const startTime = Date.now();
+  let currentIndex = 0;
+
+  await new Promise(resolve => {
+    const spinInterval = setInterval(() => {
+      segments.forEach(s => s.classList.remove('selected'));
+      segments[currentIndex % segments.length].classList.add('selected');
+      currentIndex++;
+
+      const elapsed = Date.now() - startTime;
+      if (elapsed > spinDuration || rouletteCancelled) {
+        clearInterval(spinInterval);
+        resolve();
+      }
+    }, 100);
+  });
+
+  if (rouletteCancelled) return;
+
+  const selectedCategory = categories[Math.floor(Math.random() * categories.length)];
+  const selectedPersona = personas[Math.floor(Math.random() * personas.length)];
+  const selectedSeverity = severities[Math.floor(Math.random() * severities.length)];
+
+  // Highlight the winning segment
+  segments.forEach(s => s.classList.remove('selected'));
+  const finalIdx = categories.indexOf(selectedCategory);
+  if (finalIdx >= 0) segments[finalIdx].classList.add('selected');
+
+  soundManager.playBurn(0.5);
+
+  const severityNames = { 1: 'Mild 🕯️', 2: 'Spicy 🔥', 3: 'Nuclear ☢️' };
+  const personaNames = { gordon: 'Gordon Ramsay', vc: 'VC Bro', reviewer: 'Code Reviewer', shakespeare: 'Shakespeare', genz: 'Gen Z' };
+  rouletteResultText.textContent = `🎯 ${selectedCategory.toUpperCase()} • ${personaNames[selectedPersona]} • ${severityNames[selectedSeverity]}`;
+  rouletteResult.classList.remove('hidden');
+
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  if (rouletteCancelled) return;
+
+  rouletteOverlay.classList.add('hidden');
+
+  // Apply selections in UI
+  switchTab(selectedCategory);
+  personaSelect.value = selectedPersona;
+  updatePersonaAvatar(selectedPersona);
+  activeSeverity = selectedSeverity;
+  severitySlider.value = selectedSeverity;
+  updateSeverityTheme(selectedSeverity);
+
+  // Fill with funny placeholder data
+  fillRoulettePlaceholder(selectedCategory);
+
+  // Trigger the roast
+  setTimeout(() => roastForm.dispatchEvent(new Event('submit')), 300);
+}
+
 function fillRoulettePlaceholder(category) {
   const funData = {
     github: () => {
