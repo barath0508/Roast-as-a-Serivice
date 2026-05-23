@@ -2349,3 +2349,416 @@ textarea.code-font {
   }
 }
 
+/* ================================================================
+   FEATURE 1: Text-to-Speech — Listen Button
+   ================================================================ */
+#listen-roast-btn.speaking {
+  color: hsl(var(--accent));
+  animation: tts-pulse 1s ease-in-out infinite;
+}
+
+@keyframes tts-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+#listen-roast-btn.speaking i::before {
+  content: "\f04c"; /* fa-pause */
+}
+
+/* ================================================================
+   FEATURE 2: Roast Roulette — Overlay & Spinner
+   ================================================================ */
+.roulette-header-btn {
+  position: relative;
+  overflow: hidden;
+}
+.roulette-header-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, transparent 40%, rgba(255, 202, 40, 0.15) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.roulette-header-btn:hover::after {
+  opacity: 1;
+}
+
+.roulette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.roulette-overlay.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.roulette-modal {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+
+.roulette-spinner-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.roulette-wheel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  height: 60px;
+  border-radius: var(--radius-md);
+  border: 2px solid hsl(var(--accent) / 0.5);
+  position: relative;
+}
+
+.roulette-wheel.spinning .roulette-segment {
+  animation: roulette-scroll 0.15s linear infinite;
+}
+
+.roulette-wheel.slowing .roulette-segment {
+  animation: roulette-scroll 0.4s ease-out infinite;
+}
+
+.roulette-segment {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-main);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.3s ease;
+}
+
+.roulette-segment.selected {
+  background: hsl(var(--accent) / 0.2);
+  color: hsl(var(--accent));
+  border: 2px solid hsl(var(--accent));
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 20px hsl(var(--accent) / 0.3);
+}
+
+@keyframes roulette-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-60px); }
+}
+
+.roulette-pointer {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  color: hsl(var(--accent));
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+  z-index: 2;
+}
+
+.roulette-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: hsl(var(--accent) / 0.08);
+  border: 1px solid hsl(var(--accent) / 0.25);
+}
+.roulette-result.hidden { display: none; }
+.roulette-result p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: hsl(var(--accent));
+}
+
+.roulette-cancel-btn {
+  margin-top: 1.2rem;
+  padding: 8px 28px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.roulette-cancel-btn:hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-main);
+}
+
+/* ================================================================
+   FEATURE 3: Statistics Dashboard
+   ================================================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+.stat-card:hover {
+  border-color: hsl(var(--accent) / 0.3);
+  background: hsl(var(--accent) / 0.04);
+}
+
+.stat-card .stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: hsl(var(--accent));
+  line-height: 1.2;
+}
+
+.stat-card .stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.stat-card.stat-wide {
+  grid-column: 1 / -1;
+}
+
+.stat-breakdown {
+  margin-top: 0.6rem;
+}
+.stat-breakdown-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.6rem;
+}
+
+.stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+.stat-bar-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 65px;
+  flex-shrink: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.stat-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--accent) / 0.6));
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stat-bar-count {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  width: 28px;
+  text-align: left;
+  font-weight: 700;
+}
+
+.stat-highlight-card {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.08) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid hsl(var(--accent) / 0.15);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 0.8rem;
+}
+.stat-highlight-card .stat-highlight-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: hsl(var(--accent));
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.stat-highlight-card .stat-highlight-value {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* ================================================================
+   FEATURE 4: Nuclear Visual Effects — Shake, Particles, Glow
+   ================================================================ */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-4px, -2px) rotate(-0.5deg); }
+  20% { transform: translate(4px, 2px) rotate(0.5deg); }
+  30% { transform: translate(-3px, 3px) rotate(-0.3deg); }
+  40% { transform: translate(3px, -3px) rotate(0.3deg); }
+  50% { transform: translate(-2px, 2px) rotate(-0.2deg); }
+  60% { transform: translate(2px, -2px) rotate(0.2deg); }
+  70% { transform: translate(-1px, 1px) rotate(-0.1deg); }
+  80% { transform: translate(1px, -1px) rotate(0.1deg); }
+  90% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.nuclear-shake {
+  animation: screen-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes nuclear-glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px hsl(var(--accent) / 0.2), inset 0 0 15px hsl(var(--accent) / 0.05); }
+  50% { box-shadow: 0 0 35px hsl(var(--accent) / 0.5), inset 0 0 25px hsl(var(--accent) / 0.1); }
+}
+
+.nuclear-glow {
+  animation: nuclear-glow-pulse 1.5s ease-in-out 3;
+}
+
+/* Ember particle system */
+.ember-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: inherit;
+}
+
+.ember {
+  position: absolute;
+  bottom: -10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(var(--accent));
+  opacity: 0;
+  animation: ember-rise linear forwards;
+  filter: blur(0.5px);
+}
+
+@keyframes ember-rise {
+  0% {
+    opacity: 0.9;
+    transform: translateY(0) scale(1);
+    filter: blur(0px) brightness(1.5);
+  }
+  50% {
+    opacity: 0.6;
+    filter: blur(0.5px) brightness(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-300px) translateX(var(--drift, 20px)) scale(0.3);
+    filter: blur(2px) brightness(0.5);
+  }
+}
+
+/* ================================================================
+   FEATURE 5: Comeback Generator — Output Styling
+   ================================================================ */
+.comeback-btn {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(250, 204, 21, 0.03)) !important;
+  border-color: rgba(250, 204, 21, 0.2) !important;
+  color: #facc15 !important;
+}
+.comeback-btn:hover {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.2), rgba(250, 204, 21, 0.08)) !important;
+  border-color: rgba(250, 204, 21, 0.35) !important;
+}
+.comeback-btn.hidden {
+  display: none;
+}
+
+.comeback-output {
+  padding: 1rem 1.2rem;
+  margin-top: 0.8rem;
+  border-left: 3px solid #facc15;
+  background: rgba(250, 204, 21, 0.04);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #fef3c7;
+  position: relative;
+}
+
+.comeback-label {
+  display: inline-block;
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.2);
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+/* Comeback loading indicator */
+.comeback-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.8rem 1rem;
+  margin-top: 0.8rem;
+  color: #facc15;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+.comeback-loading .spinner-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #facc15;
+  animation: comeback-dot-pulse 0.8s ease-in-out infinite alternate;
+}
+.comeback-loading .spinner-dot:nth-child(2) { animation-delay: 0.2s; }
+.comeback-loading .spinner-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes comeback-dot-pulse {
+  from { opacity: 0.3; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+

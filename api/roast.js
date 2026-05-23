@@ -94,6 +94,102 @@ export default async function handler(req, res) {
 
   let subjectDesc = '';
   const isBattle = category === 'battle';
+  const isComeback = category === 'comeback';
+
+  if (isComeback) {
+    // Comeback category: generate a clap-back/defense against the original roast
+    const personaNames = {
+      gordon: 'Gordon Ramsay',
+      vc: 'Silicon Valley VC',
+      reviewer: 'Condescending Code Reviewer',
+      shakespeare: 'Shakespearean Insulter',
+      genz: 'Gen Z'
+    };
+
+    const languagePrompts = {
+      english: 'English (Standard)',
+      hinglish: 'Hinglish (Hindi + English mixed, natural colloquial style)',
+      hindi: 'Hindi (colloquial, conversational)',
+      tamil: 'Tamil / Tanglish (colloquial, conversational)',
+      telugu: 'Telugu (colloquial, conversational)',
+      kannada: 'Kannada (colloquial, conversational)',
+      malayalam: 'Malayalam (colloquial, conversational)',
+      marathi: 'Marathi (colloquial, conversational)',
+      bengali: 'Bengali (colloquial, conversational)',
+      spanish: 'Spanish (colloquial, conversational)',
+      french: 'French (colloquial, conversational)'
+    };
+
+    const selectedLangPrompt = languagePrompts[language || 'english'] || languagePrompts['english'];
+    const roastText = data.roastText || '';
+    const subject = data.subject || 'the subject';
+
+    const prompt = `You are ${personaNames[persona] || 'a witty comedian'}. Someone has just roasted the subject "${subject}" with the following burn:
+
+---
+${roastText}
+---
+
+Now, the subject is CLAPPING BACK. Generate a savage, witty, hilarious COMEBACK / DEFENSE on behalf of the subject. The comeback should:
+1. Directly address specific points from the original roast
+2. Turn the roaster's words against them
+3. Be equally or MORE savage than the original roast
+4. Include clever wordplay and mic-drop moments
+5. End with a devastating final line
+
+Write the comeback in this language/style: ${selectedLangPrompt}
+
+Return ONLY a JSON object with this structure:
+{
+  "comeback": "the full comeback text (2-3 paragraphs, punchy and devastating)"
+}
+Do not write markdown blocks or text before/after the JSON.`;
+
+    let rawResponseText = "";
+    let lastError = "";
+    const allErrors = [];
+
+    outer: for (const model of defaultModels) {
+      for (const key of apiKeys) {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+        try {
+          const response = await fetch(geminiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ role: "user", parts: [{ text: prompt }] }],
+              generationConfig: { temperature: 0.85, maxOutputTokens: 1024 }
+            })
+          });
+          if (!response.ok) {
+            const errorText = await response.text();
+            lastError = errorText.length > 500 ? errorText.substring(0, 500) + '...[truncated]' : errorText;
+            allErrors.push(`[${model}] ${response.status}: ${lastError}`);
+            const isKeyError = response.status === 429 || response.status === 403 || lastError.includes("API_KEY_INVALID") || lastError.includes("API key expired");
+            if (isKeyError) continue;
+            break;
+          }
+          const resJson = await response.json();
+          rawResponseText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          if (rawResponseText) break outer;
+        } catch (err) {
+          lastError = err.message || err;
+          allErrors.push(`[${model}] fetch error: ${lastError}`);
+        }
+      }
+    }
+
+    if (!rawResponseText) {
+      return res.status(502).json({ error: `Comeback generation failed on backend.\nAll Errors:\n${allErrors.join('\n')}` });
+    }
+
+    const parsed = tryParseJson(rawResponseText);
+    if (parsed) {
+      return res.status(200).json(parsed);
+    } else {
+      return res.status(200).json({ comeback: rawResponseText });
+    }
+  }
 
   if (isBattle) {
     const t1 = data.target1 || 'Target A';

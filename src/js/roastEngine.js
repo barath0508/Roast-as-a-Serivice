@@ -717,4 +717,106 @@ export async function generateRoast({ category, data, severity, persona, languag
   }
 }
 
+// 5. Comeback Generator
+export async function generateComeback({ roastText, subject, persona, language, aiMode, apiKey }) {
+  const personaNames = {
+    gordon: 'Gordon Ramsay',
+    vc: 'Silicon Valley VC',
+    reviewer: 'Condescending Code Reviewer',
+    shakespeare: 'Shakespearean Insulter',
+    genz: 'Gen Z'
+  };
+
+  const languagePrompts = {
+    english: 'English (Standard)',
+    hinglish: 'Hinglish (Hindi + English mixed, natural colloquial style)',
+    hindi: 'Hindi (colloquial, conversational)',
+    tamil: 'Tamil / Tanglish (colloquial, conversational)',
+    telugu: 'Telugu (colloquial, conversational)',
+    kannada: 'Kannada (colloquial, conversational)',
+    malayalam: 'Malayalam (colloquial, conversational)',
+    marathi: 'Marathi (colloquial, conversational)',
+    bengali: 'Bengali (colloquial, conversational)',
+    spanish: 'Spanish (colloquial, conversational)',
+    french: 'French (colloquial, conversational)'
+  };
+
+  const selectedLangPrompt = languagePrompts[language || 'english'] || languagePrompts['english'];
+
+  const systemPrompt = `You are ${personaNames[persona] || 'a witty comedian'}. Someone has just roasted the subject "${subject}" with the following burn:
+
+---
+${roastText}
+---
+
+Now, the subject is CLAPPING BACK. Generate a savage, witty, hilarious COMEBACK / DEFENSE on behalf of the subject. The comeback should:
+1. Directly address specific points from the original roast
+2. Turn the roaster's words against them
+3. Be equally or MORE savage than the original roast
+4. Include clever wordplay and mic-drop moments
+5. End with a devastating final line
+
+Write the comeback in this language/style: ${selectedLangPrompt}
+
+Return ONLY a JSON object with this structure:
+{
+  "comeback": "the full comeback text (2-3 paragraphs, punchy and devastating)"
+}
+Do not write markdown blocks or text before/after the JSON.`;
+
+  if (aiMode && apiKey) {
+    // Direct AI call
+    const apiKeys = apiKey.split(',').map(k => k.trim()).filter(Boolean);
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
+
+    let rawText = '';
+    outer: for (const model of models) {
+      for (const key of apiKeys) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
+              generationConfig: { temperature: 0.85, maxOutputTokens: 1024 }
+            })
+          });
+          if (!res.ok) continue;
+          const d = await res.json();
+          rawText = d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (rawText) break outer;
+        } catch { continue; }
+      }
+    }
+
+    if (!rawText) throw new Error('Comeback generation failed across all models.');
+    const parsed = tryParseJson(rawText);
+    return parsed || { comeback: rawText };
+
+  } else if (aiMode) {
+    // Backend proxy
+    const res = await fetch('/api/roast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: 'comeback', data: { roastText, subject }, severity: '2', persona, language })
+    });
+    if (!res.ok) {
+      let errText = '';
+      try { const ej = await res.json(); errText = ej.error || ej.message; } catch { errText = await res.text(); }
+      throw new Error(errText || `Backend returned HTTP ${res.status}`);
+    }
+    return await res.json();
+  } else {
+    // Local heuristic fallback
+    await new Promise(r => setTimeout(r, 600));
+    const fallbacks = [
+      `Oh please, that roast was weaker than your WiFi signal. ${subject} has survived worse burns from a microwave. Try harder next time, amateur.`,
+      `That's the best you've got? ${subject} has been roasted by actual professionals and walked away laughing. Your insults have the impact of a wet noodle.`,
+      `Hold up, was that supposed to hurt? ${subject} has thicker skin than your code has bugs. And trust me, that's saying something. Sit down.`
+    ];
+    return { comeback: fallbacks[Math.floor(Math.random() * fallbacks.length)] };
+  }
+}
+
 export default generateRoast;

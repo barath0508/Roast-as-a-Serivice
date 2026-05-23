@@ -159,8 +159,14 @@
     </div>
     
     <div class="header-actions">
+      <button id="roulette-btn" class="header-btn roulette-header-btn" title="Roast Roulette — Random Roast!" aria-label="Roast Roulette">
+        <i class="fas fa-dice"></i>
+      </button>
       <button id="sound-toggle" class="header-btn" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
         <i class="fas fa-volume-high"></i>
+      </button>
+      <button id="stats-toggle-btn" class="header-btn" title="View Roast Statistics" aria-label="View Roast Statistics">
+        <i class="fas fa-chart-pie"></i>
       </button>
       <button id="leaderboard-toggle-btn" class="header-btn" title="View Hall of Shame" aria-label="View Hall of Shame">
         <i class="fas fa-ranking-star"></i>
@@ -491,11 +497,17 @@
           <button class="action-btn" id="copy-roast-btn" title="Copy Roast Text">
             <i class="fas fa-copy"></i> Copy Roast
           </button>
+          <button class="action-btn" id="listen-roast-btn" title="Listen to Roast">
+            <i class="fas fa-volume-up"></i> Listen
+          </button>
           <button class="action-btn" id="save-history-btn" title="Save to History">
             <i class="fas fa-bookmark"></i> Save Roast
           </button>
           <button class="action-btn share-btn" id="download-card-btn" title="Download Shareable Card">
             <i class="fas fa-download"></i> Share Card
+          </button>
+          <button class="action-btn comeback-btn hidden" id="comeback-btn" title="Generate a Comeback">
+            <i class="fas fa-bolt"></i> Comeback
           </button>
         </div>
       </section>
@@ -686,6 +698,38 @@
       <!-- Filled dynamically -->
     </div>
   </aside>
+
+  <!-- Statistics Drawer -->
+  <div class="history-drawer-overlay" id="stats-overlay"></div>
+  <aside class="history-drawer" id="stats-drawer">
+    <div class="drawer-header">
+      <h3><i class="fas fa-chart-pie"></i> Roast Statistics</h3>
+      <button id="close-stats-btn" class="close-btn" aria-label="Close Statistics Panel">&times;</button>
+    </div>
+    <div class="drawer-body" id="stats-content">
+      <!-- Filled dynamically -->
+    </div>
+  </aside>
+
+  <!-- Roulette Spinner Overlay -->
+  <div class="roulette-overlay hidden" id="roulette-overlay">
+    <div class="roulette-modal">
+      <div class="roulette-spinner-container">
+        <div class="roulette-wheel" id="roulette-wheel">
+          <div class="roulette-segment seg-github"><i class="fab fa-github"></i> GitHub</div>
+          <div class="roulette-segment seg-resume"><i class="fas fa-file-invoice"></i> Resume</div>
+          <div class="roulette-segment seg-startup"><i class="fas fa-rocket"></i> Startup</div>
+          <div class="roulette-segment seg-code"><i class="fas fa-code"></i> Code</div>
+          <div class="roulette-segment seg-custom"><i class="fas fa-align-left"></i> Custom</div>
+        </div>
+        <div class="roulette-pointer"><i class="fas fa-caret-down"></i></div>
+      </div>
+      <div class="roulette-result hidden" id="roulette-result">
+        <p id="roulette-result-text">Rolling...</p>
+      </div>
+      <button class="roulette-cancel-btn" id="roulette-cancel-btn">Cancel</button>
+    </div>
+  </div>
 
   <!-- Sound Toggle Script & Libraries -->
   <script src="/src/js/soundManager.js" type="module"></script>

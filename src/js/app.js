@@ -1,6 +1,6 @@
 import './analytics.js';
 import soundManager from './soundManager.js';
-import generateRoast from './roastEngine.js';
+import generateRoast, { generateComeback } from './roastEngine.js';
 import { trackProgress, forceUnlock, getAchievementsList, getAchievementsSummary, resetAchievements, handleReferralCheck } from './achievements.js';
 
 // DOM Elements
@@ -27,8 +27,25 @@ const heatFillBar = document.getElementById('heat-fill-bar');
 const tempDisplay = document.getElementById('temp-display');
 const outputActions = document.getElementById('output-actions');
 const copyRoastBtn = document.getElementById('copy-roast-btn');
+const listenRoastBtn = document.getElementById('listen-roast-btn');
 const saveHistoryBtn = document.getElementById('save-history-btn');
 const downloadCardBtn = document.getElementById('download-card-btn');
+const comebackBtn = document.getElementById('comeback-btn');
+
+// Stats Drawer Elements
+const statsToggleBtn = document.getElementById('stats-toggle-btn');
+const statsOverlay = document.getElementById('stats-overlay');
+const statsDrawer = document.getElementById('stats-drawer');
+const closeStatsBtn = document.getElementById('close-stats-btn');
+const statsContent = document.getElementById('stats-content');
+
+// Roulette Elements
+const rouletteBtn = document.getElementById('roulette-btn');
+const rouletteOverlay = document.getElementById('roulette-overlay');
+const rouletteWheel = document.getElementById('roulette-wheel');
+const rouletteResult = document.getElementById('roulette-result');
+const rouletteResultText = document.getElementById('roulette-result-text');
+const rouletteCancelBtn = document.getElementById('roulette-cancel-btn');
 
 // History Drawer Elements
 const historyToggleBtn = document.getElementById('history-toggle-btn');
@@ -102,6 +119,24 @@ let activeSeverity = 2; // Spicy
 let activeLanguage = localStorage.getItem('roastify_language') || 'english';
 let currentRoastText = '';
 let currentSubject = '';
+let isSpeaking = false;
+let currentUtterance = null;
+let rouletteCancelled = false;
+
+// Stats tracking state
+let roastStats = JSON.parse(localStorage.getItem('roastify_stats') || '{}');
+if (!roastStats.totalRoasts) {
+  roastStats = {
+    totalRoasts: 0,
+    categoryBreakdown: { github: 0, resume: 0, startup: 0, code: 0, custom: 0, battle: 0 },
+    severityBreakdown: { '1': 0, '2': 0, '3': 0 },
+    personaBreakdown: { gordon: 0, vc: 0, reviewer: 0, shakespeare: 0, genz: 0 },
+    highestScore: 0,
+    highestScoreSubject: '',
+    totalScoreSum: 0,
+    comebacksGenerated: 0
+  };
+}
 let roastHistory = JSON.parse(localStorage.getItem('roastify_history') || '[]');
 
 let leaderboardData = JSON.parse(localStorage.getItem('roastify_leaderboard') || '[]');
@@ -326,8 +361,34 @@ function init() {
 
   // Output Actions
   copyRoastBtn.addEventListener('click', handleCopyRoast);
+  listenRoastBtn.addEventListener('click', handleListenRoast);
   saveHistoryBtn.addEventListener('click', handleSaveRoast);
   downloadCardBtn.addEventListener('click', handleDownloadCard);
+  comebackBtn.addEventListener('click', handleGenerateComeback);
+
+  // Stats Drawer toggles
+  statsToggleBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    toggleStatsDrawer(true);
+  });
+  closeStatsBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    toggleStatsDrawer(false);
+  });
+  statsOverlay.addEventListener('click', () => {
+    toggleStatsDrawer(false);
+  });
+
+  // Roulette
+  rouletteBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    handleRouletteClick();
+  });
+  rouletteCancelBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    rouletteCancelled = true;
+    rouletteOverlay.classList.add('hidden');
+  });
 
   // Initial Renderings
   renderHistory();
@@ -835,6 +896,21 @@ async function handleIgniteSubmit(e) {
 
     // Enable Actions
     outputActions.classList.remove('disabled');
+
+    // Show Comeback button for non-battle roasts
+    if (activeTab !== 'battle') {
+      comebackBtn.classList.remove('hidden');
+    } else {
+      comebackBtn.classList.add('hidden');
+    }
+
+    // Track stats
+    trackRoastStats(activeTab, activeSeverity, persona, res.score || 0);
+
+    // Nuclear visual effects
+    if (activeSeverity === 3) {
+      triggerNuclearEffects();
+    }
 
   } catch (error) {
     clearInterval(tempInterval);
@@ -1411,6 +1487,282 @@ function setupFaqAccordion() {
       }
     });
   });
+}
+
+function fillRoulettePlaceholder(category) {
+  const funData = {
+    github: () => {
+      const usernames = ['torvalds', 'gaearon', 'tj', 'sindresorhus', 'yyx990803'];
+      document.getElementById('github-username').value = usernames[Math.floor(Math.random() * usernames.length)];
+    },
+    resume: () => {
+      const resumes = [
+        'Senior Full-Stack Developer with 10+ years experience in synergizing cross-functional deliverables across enterprise-grade microservices. Proficient in React, Node, Docker, Kubernetes, AWS, Azure, GCP, and making coffee.',
+        'Dynamic self-starter with a passion for leveraging AI/ML paradigms. Led a team of 2 interns to deploy a hello world app on Heroku. Certified Scrum Master. Expert in Microsoft Word.',
+        'Visionary technologist, ex-FAANG (applied but never heard back). Built multiple revolutionary side projects (all on localhost). Skills: Googling errors, copy-pasting from Stack Overflow, pretending to understand Kubernetes.'
+      ];
+      document.getElementById('resume-text').value = resumes[Math.floor(Math.random() * resumes.length)];
+    },
+    startup: () => {
+      const startups = [
+        { name: 'BarkChain', desc: 'Uber for dogs, but on the blockchain. We tokenize dog walks as NFTs. Pre-revenue, but our Discord has 47 members.' },
+        { name: 'SleepSync AI', desc: 'An AI-powered mattress that adjusts firmness based on your tweets. Pivoting from our failed smart pillow venture.' },
+        { name: 'ForkFlow', desc: 'A SaaS platform that uses machine learning to predict which restaurants will go bankrupt. We charge the restaurants to find out.' }
+      ];
+      const s = startups[Math.floor(Math.random() * startups.length)];
+      document.getElementById('startup-name').value = s.name;
+      document.getElementById('startup-desc').value = s.desc;
+    },
+    code: () => {
+      const snippets = [
+        'function isEven(n) {\n  if (n === 0) return true;\n  if (n === 1) return false;\n  if (n === 2) return true;\n  if (n === 3) return false;\n  return isEven(n - 2);\n}',
+        'let data = null;\ntry {\n  data = JSON.parse(response);\n} catch(e) {\n  try { data = JSON.parse(response); } catch(e2) {\n    try { data = JSON.parse(response); } catch(e3) {\n      console.log("it didnt work");\n    }\n  }\n}',
+        'var x = true;\nif (x == true) {\n  if (x === true) {\n    if (Boolean(x) == true) {\n      console.log("x is probably true");\n    }\n  }\n}'
+      ];
+      document.getElementById('code-editor').value = snippets[Math.floor(Math.random() * snippets.length)];
+    },
+    custom: () => {
+      const targets = [
+        { target: 'My coding bootcamp instructor', text: 'Charges $15k to teach students HTML and calls it "Full Stack Engineering". Has a LinkedIn headline longer than their actual experience.' },
+        { target: 'Crypto bro at the coffee shop', text: 'Wears a Bored Ape hoodie, pays for everything in crypto (nobody accepts it), and constantly talks about being "early".' },
+        { target: 'The office Slack over-sender', text: 'Sends 47 messages where one would suffice. Types "hey" then nothing for 10 minutes. Reacts with 🎉 to their own messages.' }
+      ];
+      const t = targets[Math.floor(Math.random() * targets.length)];
+      document.getElementById('custom-target').value = t.target;
+      document.getElementById('custom-text').value = t.text;
+    }
+  };
+
+  if (funData[category]) funData[category]();
+}
+
+// ==========================================================================
+// FEATURE 3: Statistics Dashboard
+// ==========================================================================
+function toggleStatsDrawer(open) {
+  if (open) {
+    renderStats();
+    statsDrawer.classList.add('active');
+    statsOverlay.classList.add('active');
+  } else {
+    statsDrawer.classList.remove('active');
+    statsOverlay.classList.remove('active');
+  }
+}
+
+function trackRoastStats(category, severity, persona, score) {
+  roastStats.totalRoasts++;
+  roastStats.categoryBreakdown[category] = (roastStats.categoryBreakdown[category] || 0) + 1;
+  roastStats.severityBreakdown[severity.toString()] = (roastStats.severityBreakdown[severity.toString()] || 0) + 1;
+  roastStats.personaBreakdown[persona] = (roastStats.personaBreakdown[persona] || 0) + 1;
+  roastStats.totalScoreSum += score;
+  
+  if (score > roastStats.highestScore) {
+    roastStats.highestScore = score;
+    roastStats.highestScoreSubject = currentSubject;
+  }
+
+  localStorage.setItem('roastify_stats', JSON.stringify(roastStats));
+}
+
+function renderStats() {
+  const total = roastStats.totalRoasts || 0;
+  const avgScore = total > 0 ? Math.round(roastStats.totalScoreSum / total) : 0;
+  
+  // Find favorite persona
+  let favPersona = 'None';
+  let favPersonaCount = 0;
+  const personaLabels = { gordon: 'Gordon Ramsay', vc: 'VC Bro', reviewer: 'Code Reviewer', shakespeare: 'Shakespeare', genz: 'Gen Z' };
+  for (const [key, count] of Object.entries(roastStats.personaBreakdown)) {
+    if (count > favPersonaCount) { favPersona = personaLabels[key] || key; favPersonaCount = count; }
+  }
+
+  // Find favorite severity
+  let favSeverity = 'None';
+  let favSevCount = 0;
+  const sevLabels = { '1': 'Mild 🕯️', '2': 'Spicy 🔥', '3': 'Nuclear ☢️' };
+  for (const [key, count] of Object.entries(roastStats.severityBreakdown)) {
+    if (count > favSevCount) { favSeverity = sevLabels[key] || key; favSevCount = count; }
+  }
+
+  // Category breakdown bars
+  const maxCategoryCount = Math.max(1, ...Object.values(roastStats.categoryBreakdown));
+  const categoryBars = Object.entries(roastStats.categoryBreakdown).map(([cat, count]) => {
+    const pct = Math.round((count / maxCategoryCount) * 100);
+    return `<div class="stat-bar-row">
+      <span class="stat-bar-label">${cat}</span>
+      <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pct}%"></div></div>
+      <span class="stat-bar-count">${count}</span>
+    </div>`;
+  }).join('');
+
+  statsContent.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">${total}</div>
+        <div class="stat-label">Total Roasts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${avgScore}</div>
+        <div class="stat-label">Avg Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${roastStats.highestScore}</div>
+        <div class="stat-label">Highest Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${roastStats.comebacksGenerated}</div>
+        <div class="stat-label">Comebacks</div>
+      </div>
+    </div>
+
+    <div class="stat-breakdown">
+      <div class="stat-breakdown-title">Category Breakdown</div>
+      ${categoryBars}
+    </div>
+
+    <div class="stat-highlight-card">
+      <div class="stat-highlight-title">🎭 Favorite Persona</div>
+      <div class="stat-highlight-value">${favPersona} (${favPersonaCount} roasts)</div>
+    </div>
+
+    <div class="stat-highlight-card">
+      <div class="stat-highlight-title">🌡️ Preferred Heat Level</div>
+      <div class="stat-highlight-value">${favSeverity} (${favSevCount} roasts)</div>
+    </div>
+
+    ${roastStats.highestScoreSubject ? `<div class="stat-highlight-card">
+      <div class="stat-highlight-title">🏆 Most Roastable Target</div>
+      <div class="stat-highlight-value">${escapeHtml(roastStats.highestScoreSubject)} — Score: ${roastStats.highestScore}</div>
+    </div>` : ''}
+  `;
+}
+
+// ==========================================================================
+// FEATURE 4: Nuclear Visual Effects
+// ==========================================================================
+function triggerNuclearEffects() {
+  const outputPanel = document.getElementById('output-panel');
+  if (!outputPanel) return;
+
+  // Screen shake
+  outputPanel.classList.add('nuclear-shake');
+  setTimeout(() => outputPanel.classList.remove('nuclear-shake'), 700);
+
+  // Glow pulse
+  outputPanel.classList.add('nuclear-glow');
+  setTimeout(() => outputPanel.classList.remove('nuclear-glow'), 4600);
+
+  // Spawn ember particles
+  spawnEmberParticles(outputPanel, 25);
+}
+
+function spawnEmberParticles(container, count) {
+  // Ensure container has relative positioning
+  container.style.position = 'relative';
+  
+  const emberContainer = document.createElement('div');
+  emberContainer.className = 'ember-container';
+  container.appendChild(emberContainer);
+
+  for (let i = 0; i < count; i++) {
+    const ember = document.createElement('div');
+    ember.className = 'ember';
+    
+    // Randomize properties
+    const left = Math.random() * 100;
+    const size = Math.random() * 4 + 3;
+    const duration = Math.random() * 2 + 1.5;
+    const delay = Math.random() * 1.5;
+    const drift = (Math.random() - 0.5) * 80;
+
+    ember.style.left = `${left}%`;
+    ember.style.width = `${size}px`;
+    ember.style.height = `${size}px`;
+    ember.style.setProperty('--drift', `${drift}px`);
+    ember.style.animationDuration = `${duration}s`;
+    ember.style.animationDelay = `${delay}s`;
+
+    // Vary colors between accent, orange, and yellow
+    const colors = ['hsl(var(--accent))', '#ff6600', '#ffaa00', '#ff3300'];
+    ember.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    emberContainer.appendChild(ember);
+  }
+
+  // Clean up after animations complete
+  setTimeout(() => {
+    if (emberContainer.parentNode) {
+      emberContainer.remove();
+    }
+  }, 5000);
+}
+
+// ==========================================================================
+// FEATURE 5: Comeback Generator
+// ==========================================================================
+async function handleGenerateComeback() {
+  if (!currentRoastText) return;
+  soundManager.playClick();
+
+  const persona = personaSelect.value;
+  const language = languageSelect.value;
+  const aiMode = aiModeToggle.checked;
+  const apiKey = geminiKeyInput.value.trim() || import.meta.env.VITE_GEMINI_API_KEY || '';
+
+  // Show loading in terminal
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'comeback-loading';
+  loadingDiv.innerHTML = '<span class="spinner-dot"></span><span class="spinner-dot"></span><span class="spinner-dot"></span> Generating comeback...';
+  terminalOutput.appendChild(loadingDiv);
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+  // Disable comeback button during generation
+  comebackBtn.setAttribute('disabled', 'disabled');
+  comebackBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+  try {
+    const result = await generateComeback({
+      roastText: currentRoastText,
+      subject: currentSubject,
+      persona,
+      language,
+      aiMode,
+      apiKey
+    });
+
+    // Remove loading indicator
+    if (loadingDiv.parentNode) loadingDiv.remove();
+
+    // Display comeback in terminal
+    const comebackDiv = document.createElement('div');
+    comebackDiv.className = 'comeback-output';
+    comebackDiv.innerHTML = `<div class="comeback-label">⚡ COMEBACK — ${escapeHtml(currentSubject)} CLAPS BACK</div><div class="comeback-text"></div>`;
+    terminalOutput.appendChild(comebackDiv);
+
+    // Animate comeback text
+    const comebackTextEl = comebackDiv.querySelector('.comeback-text');
+    const comebackText = result.comeback || 'The subject was too stunned to respond.';
+    await animateText(comebackTextEl, comebackText, 12);
+
+    // Track stats
+    roastStats.comebacksGenerated = (roastStats.comebacksGenerated || 0) + 1;
+    localStorage.setItem('roastify_stats', JSON.stringify(roastStats));
+
+    soundManager.playLaughter();
+
+  } catch (error) {
+    if (loadingDiv.parentNode) loadingDiv.remove();
+    terminalOutput.innerHTML += `
+      <div class="terminal-line" style="color: #fbbf24; font-weight: bold;">
+        <span class="prompt">></span> COMEBACK FAILED: ${escapeHtml(error.message)}
+      </div>
+    `;
+    console.error('Comeback error:', error);
+  } finally {
+    comebackBtn.removeAttribute('disabled');
+    comebackBtn.innerHTML = '<i class="fas fa-bolt"></i> Comeback';
+  }
 }
 
 // Initialize on DOM load
