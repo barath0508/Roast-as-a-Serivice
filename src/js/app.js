@@ -181,9 +181,11 @@ function init() {
   if (savedKey) {
     geminiKeyInput.value = savedKey;
     aiKeyWrapper.classList.add('visible');
+    aiKeyWrapper.classList.remove('hidden');
   } else if (envKey) {
     geminiKeyInput.value = envKey;
     aiKeyWrapper.classList.add('visible');
+    aiKeyWrapper.classList.remove('hidden');
   }
   
   // Set initial theme
@@ -239,10 +241,12 @@ function init() {
     soundManager.playClick();
     if (e.target.checked) {
       aiKeyWrapper.classList.add('visible');
+      aiKeyWrapper.classList.remove('hidden');
       // Load saved key if exists in session storage
       geminiKeyInput.value = sessionStorage.getItem('gemini_api_key') || '';
     } else {
       aiKeyWrapper.classList.remove('visible');
+      aiKeyWrapper.classList.add('hidden');
     }
   });
 
