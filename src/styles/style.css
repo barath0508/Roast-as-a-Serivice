@@ -1291,6 +1291,24 @@ textarea.code-font {
   }
 }
 
+@media (max-width: 768px) {
+  .bg-orb {
+    animation: none !important;
+    filter: blur(80px);
+  }
+  .orb-1 {
+    width: 260px;
+    height: 260px;
+  }
+  .orb-2 {
+    width: 280px;
+    height: 280px;
+  }
+  .orb-3 {
+    display: none;
+  }
+}
+
 @media (max-width: 600px) {
   .logo-container h1 {
     font-size: 1.4rem;
@@ -1347,6 +1365,9 @@ textarea.code-font {
   .anon-banner {
     padding: 8px 1rem;
   }
+  .seo-text-column, .seo-faq-column {
+    padding: 1.2rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1368,6 +1389,7 @@ textarea.code-font {
   }
   .score-overall-container {
     flex-direction: column;
+    align-items: center;
     text-align: center;
     gap: 0.5rem;
   }

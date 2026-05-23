@@ -508,6 +508,14 @@ function loadRoastToTerminal(item) {
     <div class="roast-output">${escapeHtml(item.roast)}</div>
   `;
   outputActions.classList.remove('disabled');
+
+  // Scroll to output panel on mobile/tablet viewports
+  if (window.innerWidth <= 1024) {
+    const outputPanel = document.getElementById('output-panel');
+    if (outputPanel) {
+      outputPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 }
 
 // GitHub API Fetcher
@@ -633,6 +641,14 @@ async function handleIgniteSubmit(e) {
   roastScorePanel.classList.add('hidden');
   battleScorePanel.classList.add('hidden');
   currentRoastText = '';
+
+  // Scroll to output panel on mobile/tablet viewports
+  if (window.innerWidth <= 1024) {
+    const outputPanel = document.getElementById('output-panel');
+    if (outputPanel) {
+      outputPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 
   // Get configuration
   const persona = personaSelect.value;
