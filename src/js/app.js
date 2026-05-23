@@ -1,5 +1,6 @@
 import soundManager from './soundManager.js';
 import generateRoast from './roastEngine.js';
+import { trackProgress, forceUnlock, getAchievementsList, getAchievementsSummary, resetAchievements, handleReferralCheck } from './achievements.js';
 
 // DOM Elements
 const body = document.body;
@@ -36,6 +37,49 @@ const closeHistoryBtn = document.getElementById('close-history-btn');
 const clearHistoryBtn = document.getElementById('clear-history-btn');
 const historyList = document.getElementById('history-list');
 
+// Achievements Drawer Elements
+const achievementsToggleBtn = document.getElementById('achievements-toggle-btn');
+const achievementsBadge = document.getElementById('achievements-badge');
+const achievementsOverlay = document.getElementById('achievements-overlay');
+const achievementsDrawer = document.getElementById('achievements-drawer');
+const closeAchievementsBtn = document.getElementById('close-achievements-btn');
+const resetAchievementsBtn = document.getElementById('reset-achievements-btn');
+const achievementsList = document.getElementById('achievements-list');
+const achievementsProgressText = document.getElementById('achievements-progress-text');
+
+// Leaderboard Drawer Elements
+const leaderboardToggleBtn = document.getElementById('leaderboard-toggle-btn');
+const leaderboardOverlay = document.getElementById('leaderboard-overlay');
+const leaderboardDrawer = document.getElementById('leaderboard-drawer');
+const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
+const leaderboardList = document.getElementById('leaderboard-list');
+
+// Battle Fields
+const battleGithubFields = document.querySelectorAll('.battle-github-fields');
+const battleCustomFields = document.querySelectorAll('.battle-custom-fields');
+const battleGithub1 = document.getElementById('battle-github-1');
+const battleGithub2 = document.getElementById('battle-github-2');
+const battleCustomName1 = document.getElementById('battle-custom-name-1');
+const battleCustomDesc1 = document.getElementById('battle-custom-desc-1');
+const battleCustomName2 = document.getElementById('battle-custom-name-2');
+const battleCustomDesc2 = document.getElementById('battle-custom-desc-2');
+const battleTypeRadios = document.getElementsByName('battle-type');
+
+// Roast Score Panel
+const roastScorePanel = document.getElementById('roast-score-panel');
+const scoreCircleFill = document.getElementById('score-circle-fill');
+const scoreNumberDisplay = document.getElementById('score-number-display');
+const scoreRatingText = document.getElementById('score-rating-text');
+const metricCringeFill = document.getElementById('metric-cringe-fill');
+const metricCringeVal = document.getElementById('metric-cringe-val');
+const metricBuzzwordFill = document.getElementById('metric-buzzword-fill');
+const metricBuzzwordVal = document.getElementById('metric-buzzword-val');
+const metricFlagsFill = document.getElementById('metric-flags-fill');
+const metricFlagsVal = document.getElementById('metric-flags-val');
+
+// Anonymous Banner
+const anonBanner = document.getElementById('anon-banner');
+
 // Sound Toggle Header Button
 const soundToggleBtn = document.getElementById('sound-toggle');
 
@@ -45,6 +89,16 @@ let activeSeverity = 2; // Spicy
 let currentRoastText = '';
 let currentSubject = '';
 let roastHistory = JSON.parse(localStorage.getItem('roastify_history') || '[]');
+
+let leaderboardData = JSON.parse(localStorage.getItem('roastify_leaderboard') || '[]');
+if (leaderboardData.length === 0) {
+  leaderboardData = [
+    { name: 'github/torvalds', score: 98, date: new Date().toISOString(), type: 'github', summary: 'Spaghetti code reviewer declared: "Your commits look like a crime scene... squash them!"' },
+    { name: 'startup/ZuckMetaverse', score: 95, date: new Date().toISOString(), type: 'startup', summary: 'Silicon Valley VC said: "A pre-revenue cash incinerator with negative enterprise value."' },
+    { name: 'github/elonmusk', score: 92, date: new Date().toISOString(), type: 'github', summary: 'Condescending Code Reviewer sighed: "Rejecting this branch. Go back to boot camp."' }
+  ];
+  localStorage.setItem('roastify_leaderboard', JSON.stringify(leaderboardData));
+}
 
 // Fun Loading Phase Messages
 const LOADING_MESSAGES = [
@@ -168,6 +222,72 @@ function init() {
     }
   });
 
+  // Achievements Drawer toggles
+  achievementsToggleBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    toggleAchievementsDrawer(true);
+  });
+  closeAchievementsBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    toggleAchievementsDrawer(false);
+  });
+  achievementsOverlay.addEventListener('click', () => {
+    toggleAchievementsDrawer(false);
+  });
+  resetAchievementsBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    if (confirm("Are you sure you want to reset all achievements progress?")) {
+      resetAchievements();
+      renderAchievements();
+    }
+  });
+
+  // Leaderboard Drawer toggles
+  leaderboardToggleBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    toggleLeaderboardDrawer(true);
+  });
+  closeLeaderboardBtn.addEventListener('click', () => {
+    soundManager.playClick();
+    toggleLeaderboardDrawer(false);
+  });
+  leaderboardOverlay.addEventListener('click', () => {
+    toggleLeaderboardDrawer(false);
+  });
+
+  // Battle Type Radio toggles
+  battleTypeRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      soundManager.playClick();
+      updateBattleInputsVisibility();
+    });
+  });
+
+  // Check URL parameters for referral/anonymous request
+  handleReferralCheck();
+  
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('anon') === 'true') {
+    anonBanner.classList.remove('hidden');
+    const target = params.get('target');
+    if (target) {
+      switchTab('custom');
+      document.getElementById('custom-target').value = target;
+      trackProgress('ANON_REQUESTED', 1);
+    }
+  }
+
+  // Inject Anonymous Link Generator inside Custom tab
+  setupAnonymousRequestLinkGenerator();
+
+  // Listen for global achievement updates
+  window.addEventListener('achievement-unlocked', () => {
+    updateAchievementsBadge();
+  });
+  window.addEventListener('achievements-reset', () => {
+    updateAchievementsBadge();
+  });
+
   // Form Submission
   roastForm.addEventListener('submit', handleIgniteSubmit);
 
@@ -176,8 +296,9 @@ function init() {
   saveHistoryBtn.addEventListener('click', handleSaveRoast);
   downloadCardBtn.addEventListener('click', handleDownloadCard);
 
-  // Initial History Render
+  // Initial Renderings
   renderHistory();
+  updateAchievementsBadge();
 }
 
 // Sound icon updater
@@ -206,15 +327,25 @@ function switchTab(tabName) {
   tabContents.forEach(content => {
     if (content.id === `tab-${tabName}`) {
       content.classList.add('active');
-      // Set child input required attribute
-      const input = content.querySelector('input, textarea');
-      if (input) input.setAttribute('required', 'required');
+      if (tabName !== 'battle') {
+        const input = content.querySelector('input, textarea');
+        if (input) input.setAttribute('required', 'required');
+      }
     } else {
       content.classList.remove('active');
       const input = content.querySelector('input, textarea');
       if (input) input.removeAttribute('required');
     }
   });
+
+  if (tabName === 'battle') {
+    updateBattleInputsVisibility();
+  } else {
+    battleGithub1.removeAttribute('required');
+    battleGithub2.removeAttribute('required');
+    battleCustomName1.removeAttribute('required');
+    battleCustomName2.removeAttribute('required');
+  }
 }
 
 // Dynamic theme changing based on severity
@@ -387,45 +518,77 @@ function updateLoadingText(text) {
   loadingPhaseText.textContent = text;
 }
 
-// Typewriter output animation in terminal
+// Text animation helper that prints characters one by one
+async function animateText(outputDiv, text, speed = 15) {
+  const characters = Array.from(text);
+  let currentOutput = '';
+  for (let i = 0; i < characters.length; i++) {
+    currentOutput += characters[i];
+    outputDiv.innerHTML = escapeHtml(currentOutput).replace(/\n/g, '<br>');
+    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    
+    if (i % 4 === 0) {
+      soundManager.playTypewriter();
+    }
+    await new Promise(resolve => setTimeout(resolve, speed));
+  }
+}
+
+// Typewriter output animation in terminal for standard roasts
 async function runTypewriter(text) {
   terminalOutput.innerHTML = `<div class="terminal-line system-line"><span class="prompt">></span> Analysis complete. Dispensing burns:</div>`;
   const outputDiv = document.createElement('div');
   outputDiv.className = 'roast-output';
   terminalOutput.appendChild(outputDiv);
-
-  // Scroll to bottom
   terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
-  const characters = Array.from(text);
-  let currentOutput = '';
-  
-  // Custom typing speed control
   const speed = activeSeverity === 1 ? 25 : activeSeverity === 2 ? 15 : 8;
+  await animateText(outputDiv, text, speed);
+}
 
-  for (let i = 0; i < characters.length; i++) {
-    currentOutput += characters[i];
-    outputDiv.innerHTML = escapeHtml(currentOutput);
-    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+// Typewriter animation specifically for Battle Mode results
+async function runBattleTypewriter(res) {
+  terminalOutput.innerHTML = `<div class="terminal-line system-line"><span class="prompt">></span> Battle analysis complete. Dispensing dual burns:</div>`;
+  const speed = activeSeverity === 1 ? 20 : activeSeverity === 2 ? 12 : 6;
 
-    // Play retro typewriter frequency pop every 4th char to avoid distortion
-    if (i % 4 === 0) {
-      soundManager.playTypewriter();
-    }
+  // 1. Contestant 1 Roast
+  const name1 = currentSubject.split(' vs ')[0].replace('battle: ', '');
+  const div1 = document.createElement('div');
+  div1.className = 'roast-output';
+  div1.innerHTML = `<div style="font-weight: 800; color: hsl(var(--accent)); margin-bottom: 6px;">⚔️ CONTESTANT 1: ${escapeHtml(name1)} (Score: ${res.score1})</div>`;
+  terminalOutput.appendChild(div1);
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+  await animateText(div1, res.roast1, speed);
 
-    await new Promise(resolve => setTimeout(resolve, speed));
-  }
+  // 2. Contestant 2 Roast
+  const name2 = currentSubject.split(' vs ')[1];
+  const div2 = document.createElement('div');
+  div2.className = 'roast-output';
+  div2.innerHTML = `<div style="font-weight: 800; color: hsl(var(--accent)); margin-bottom: 6px;">⚔️ CONTESTANT 2: ${escapeHtml(name2)} (Score: ${res.score2})</div>`;
+  terminalOutput.appendChild(div2);
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+  await animateText(div2, res.roast2, speed);
+
+  // 3. Verdict & Winner
+  const divVerdict = document.createElement('div');
+  divVerdict.className = 'roast-output';
+  divVerdict.style.borderColor = 'var(--accent-glow)';
+  divVerdict.innerHTML = `<div style="font-weight: 800; color: #ffca28; margin-bottom: 6px;">🏆 BATTLE VERDICT: Winner is ${escapeHtml(res.winner)}</div>`;
+  terminalOutput.appendChild(divVerdict);
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+  await animateText(divVerdict, res.verdict, speed);
 }
 
 // Form submit event handler
 async function handleIgniteSubmit(e) {
   e.preventDefault();
   
-  // Audio context initialization block
+  // Audio context initialization
   soundManager.initContext();
 
-  // Reset actions buttons
+  // Reset actions buttons & hide score panel
   outputActions.classList.add('disabled');
+  roastScorePanel.classList.add('hidden');
   currentRoastText = '';
 
   // Get configuration
@@ -509,12 +672,44 @@ async function handleIgniteSubmit(e) {
       const text = document.getElementById('custom-text').value.trim();
       currentSubject = `custom/${target}`;
       payloadData = { target: target, text: text };
+    } else if (activeTab === 'battle') {
+      const battleType = document.querySelector('input[name="battle-type"]:checked').value;
+      if (battleType === 'github') {
+        const u1 = battleGithub1.value.trim();
+        const u2 = battleGithub2.value.trim();
+        currentSubject = `battle: ${u1} vs ${u2}`;
+        
+        updateLoadingText(`Fetching profile for ${u1}...`);
+        const profile1 = await fetchGithubProfile(u1);
+        
+        updateLoadingText(`Fetching profile for ${u2}...`);
+        const profile2 = await fetchGithubProfile(u2);
+        
+        payloadData = {
+          type: 'github',
+          target1: u1,
+          target2: u2,
+          profile1,
+          profile2
+        };
+      } else {
+        const n1 = battleCustomName1.value.trim();
+        const n2 = battleCustomName2.value.trim();
+        currentSubject = `battle: ${n1} vs ${n2}`;
+        payloadData = {
+          type: 'custom',
+          target1: n1,
+          target2: n2,
+          text1: battleCustomDesc1.value.trim(),
+          text2: battleCustomDesc2.value.trim()
+        };
+      }
     }
 
     updateLoadingText("Condensing heat particles...");
 
     // Call Engine
-    const roast = await generateRoast({
+    const res = await generateRoast({
       category: activeTab,
       data: payloadData,
       severity: activeSeverity.toString(),
@@ -523,17 +718,40 @@ async function handleIgniteSubmit(e) {
       apiKey: apiKey
     });
 
-    currentRoastText = roast;
-
     // Clean up loading loops
     clearInterval(tempInterval);
     clearInterval(messageInterval);
     typingIndicator.classList.add('hidden');
 
-    // Typewriter effect
-    await runTypewriter(roast);
+    if (activeTab === 'battle') {
+      currentRoastText = `Contestant 1 (${currentSubject.split(' vs ')[0].replace('battle: ', '')}) Roast:\n${res.roast1}\n\nContestant 2 (${currentSubject.split(' vs ')[1]}) Roast:\n${res.roast2}\n\nVERDICT:\n${res.verdict}\n\n🏆 Winner: ${res.winner}`;
+      
+      // Typewrite battle details
+      await runBattleTypewriter(res);
 
-    // Play chiptune victory/laugh laugh sound
+      // Track battle achievements
+      trackProgress('BATTLE_VETERAN', 1);
+    } else {
+      currentRoastText = res.roast;
+      
+      // Typewriter effect
+      await runTypewriter(res.roast);
+      
+      // Show Roast Score panel
+      showRoastScore(res.score, res.cringe, res.buzzword, res.flags);
+
+      // Update leaderboard
+      updateLeaderboardWithRoast(currentSubject, res.score, activeTab, res.roast);
+
+      // Track standard roast achievements
+      trackProgress('FIRST_ROAST', 1);
+      trackProgress('TEN_ROASTS', 1);
+      if (res.score >= 90) {
+        trackProgress('HALL_OF_FLAME', 1);
+      }
+    }
+
+    // Play chiptune victory sound
     soundManager.playLaughter();
 
     // Enable Actions
@@ -616,6 +834,9 @@ function handleSaveRoast() {
 function handleDownloadCard() {
   if (!currentRoastText) return;
   soundManager.playClick();
+
+  // Track achievements
+  trackProgress('SHARED_CARD', 1);
 
   // Create a canvas dynamically
   const canvas = document.createElement('canvas');
@@ -791,6 +1012,238 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// ==========================================================================
+// Viral Features helper functions
+// ==========================================================================
+
+function updateBattleInputsVisibility() {
+  const battleType = document.querySelector('input[name="battle-type"]:checked').value;
+  if (battleType === 'github') {
+    battleGithubFields.forEach(el => el.classList.remove('hidden'));
+    battleCustomFields.forEach(el => el.classList.add('hidden'));
+    battleGithub1.setAttribute('required', 'required');
+    battleGithub2.setAttribute('required', 'required');
+    battleCustomName1.removeAttribute('required');
+    battleCustomName2.removeAttribute('required');
+  } else {
+    battleGithubFields.forEach(el => el.classList.add('hidden'));
+    battleCustomFields.forEach(el => el.classList.remove('hidden'));
+    battleGithub1.removeAttribute('required');
+    battleGithub2.removeAttribute('required');
+    battleCustomName1.setAttribute('required', 'required');
+    battleCustomName2.setAttribute('required', 'required');
+  }
+}
+
+function setupAnonymousRequestLinkGenerator() {
+  const customTab = document.getElementById('tab-custom');
+  if (customTab) {
+    if (document.getElementById('gen-anon-link-btn')) return;
+    
+    const anonBtnWrapper = document.createElement('div');
+    anonBtnWrapper.className = 'mt-3 mb-2';
+    anonBtnWrapper.innerHTML = `
+      <button type="button" id="gen-anon-link-btn" class="header-btn" style="width: 100%; font-size: 0.82rem; padding: 8px 12px; gap: 8px; justify-content: center;">
+        <i class="fas fa-mask"></i> Generate Anonymous Roast Link for Friend
+      </button>
+      <p id="anon-link-output" class="input-desc hidden" style="color: #a855f7; word-break: break-all; margin-top: 8px;"></p>
+    `;
+    customTab.appendChild(anonBtnWrapper);
+    
+    anonBtnWrapper.querySelector('#gen-anon-link-btn').addEventListener('click', () => {
+      soundManager.playClick();
+      const target = document.getElementById('custom-target').value.trim();
+      if (!target) {
+        alert('Please enter who you want to roast first in the target field above!');
+        return;
+      }
+      const anonLink = `${window.location.origin}${window.location.pathname}?anon=true&target=${encodeURIComponent(target)}`;
+      navigator.clipboard.writeText(anonLink).then(() => {
+        const out = anonBtnWrapper.querySelector('#anon-link-output');
+        out.classList.remove('hidden');
+        out.innerHTML = `<i class="fas fa-check"></i> Link Copied! Send it to your friend: <br><strong>${anonLink}</strong>`;
+        trackProgress('ANON_REQUESTED', 1);
+      });
+    });
+  }
+}
+
+function updateLeaderboardWithRoast(name, score, type, roastText) {
+  const existingIndex = leaderboardData.findIndex(item => item.name.toLowerCase() === name.toLowerCase());
+  if (existingIndex !== -1) {
+    if (score > leaderboardData[existingIndex].score) {
+      leaderboardData[existingIndex].score = score;
+      leaderboardData[existingIndex].date = new Date().toISOString();
+      leaderboardData[existingIndex].summary = roastText.substring(0, 80) + '...';
+    }
+  } else {
+    leaderboardData.push({
+      name: name,
+      score: score,
+      date: new Date().toISOString(),
+      type: type,
+      summary: roastText.substring(0, 80) + '...'
+    });
+  }
+
+  leaderboardData.sort((a, b) => b.score - a.score);
+  leaderboardData = leaderboardData.slice(0, 10);
+  localStorage.setItem('roastify_leaderboard', JSON.stringify(leaderboardData));
+}
+
+function showRoastScore(score, cringe, buzzword, flags) {
+  roastScorePanel.classList.remove('hidden');
+  
+  const offset = 251.2 - (251.2 * score) / 100;
+  scoreCircleFill.style.strokeDashoffset = offset;
+  
+  let count = 0;
+  scoreNumberDisplay.textContent = 0;
+  const interval = setInterval(() => {
+    if (count >= score) {
+      scoreNumberDisplay.textContent = score;
+      clearInterval(interval);
+    } else {
+      count++;
+      scoreNumberDisplay.textContent = count;
+    }
+  }, 8);
+  
+  let rating = 'MILD TEASING';
+  if (score >= 90) rating = 'CRITICAL MELTDOWN';
+  else if (score >= 70) rating = 'SCORCHING HEAT';
+  else if (score >= 50) rating = 'PIPING HOT';
+  
+  scoreRatingText.textContent = rating;
+  
+  metricCringeFill.style.width = `${cringe}%`;
+  metricCringeVal.textContent = `${cringe}%`;
+  
+  metricBuzzwordFill.style.width = `${buzzword}%`;
+  metricBuzzwordVal.textContent = `${buzzword}%`;
+  
+  metricFlagsFill.style.width = `${flags}%`;
+  metricFlagsVal.textContent = `${flags}%`;
+}
+
+function toggleAchievementsDrawer(open) {
+  if (open) {
+    renderAchievements();
+    achievementsDrawer.classList.add('active');
+    achievementsOverlay.classList.add('active');
+  } else {
+    achievementsDrawer.classList.remove('active');
+    achievementsOverlay.classList.remove('active');
+  }
+}
+
+function toggleLeaderboardDrawer(open) {
+  if (open) {
+    renderLeaderboard();
+    leaderboardDrawer.classList.add('active');
+    leaderboardOverlay.classList.add('active');
+  } else {
+    leaderboardDrawer.classList.remove('active');
+    leaderboardOverlay.classList.remove('active');
+  }
+}
+
+function updateAchievementsBadge() {
+  const summary = getAchievementsSummary();
+  achievementsBadge.textContent = summary.unlocked;
+  if (summary.unlocked > 0) {
+    achievementsBadge.classList.remove('hidden');
+  } else {
+    achievementsBadge.classList.add('hidden');
+  }
+  
+  const progressText = document.getElementById('achievements-progress-text');
+  if (progressText) {
+    progressText.textContent = `Unlocked: ${summary.unlocked}/${summary.total}`;
+  }
+}
+
+function renderAchievements() {
+  const list = getAchievementsList();
+  achievementsList.innerHTML = '';
+  
+  list.forEach(item => {
+    const el = document.createElement('div');
+    el.className = `achievement-item ${item.unlocked ? 'achievement-unlocked-state' : 'achievement-locked'}`;
+    
+    const isProgressTracked = item.maxProgress > 1;
+    const progressPercent = (item.progress / item.maxProgress) * 100;
+    
+    el.innerHTML = `
+      <div class="achievement-item-badge">${item.badge}</div>
+      <div class="achievement-item-info">
+        <div class="achievement-item-title">${escapeHtml(item.title)}</div>
+        <div class="achievement-item-desc">${escapeHtml(item.description)}</div>
+        ${isProgressTracked && !item.unlocked ? `
+          <div class="achievement-item-progress">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
+            </div>
+            <span class="progress-text">${item.progress}/${item.maxProgress}</span>
+          </div>
+        ` : ''}
+        ${item.unlocked ? `<div class="achievement-item-reward">Title Unlocked: ${item.rewardTitle}</div>` : ''}
+      </div>
+    `;
+    achievementsList.appendChild(el);
+  });
+}
+
+function renderLeaderboard() {
+  leaderboardList.innerHTML = '';
+  
+  const sorted = [...leaderboardData].sort((a, b) => b.score - a.score);
+  sorted.forEach((item, index) => {
+    const el = document.createElement('div');
+    el.className = `leaderboard-item rank-${index + 1}`;
+    
+    el.innerHTML = `
+      <div class="leaderboard-rank">#${index + 1}</div>
+      <div class="leaderboard-details">
+        <div class="leaderboard-name">${escapeHtml(item.name)}</div>
+        <div class="leaderboard-meta">${new Date(item.date).toLocaleDateString()} • ${escapeHtml(item.type.toUpperCase())}</div>
+      </div>
+      <div class="leaderboard-score">${item.score}</div>
+    `;
+    leaderboardList.appendChild(el);
+  });
+  
+  const ctaCard = document.createElement('div');
+  ctaCard.className = 'achievement-item';
+  ctaCard.style.marginTop = '1rem';
+  ctaCard.style.border = '1px dashed rgba(168, 85, 247, 0.4)';
+  ctaCard.style.background = 'rgba(168, 85, 247, 0.05)';
+  ctaCard.innerHTML = `
+    <div class="achievement-item-badge">🧨</div>
+    <div class="achievement-item-info">
+      <div class="achievement-item-title" style="color: #c084fc;">Recruit Co-conspirators</div>
+      <div class="achievement-item-desc">Copy referral link and share to unlock "Pyromaniac" title!</div>
+      <button id="copy-ref-link-btn" class="ignite-btn" style="padding: 6px 12px; font-size: 0.75rem; margin-top: 8px; width: auto; background: linear-gradient(135deg, #ffffff 0%, #c084fc 100%); border-radius: 4px; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.2);">
+        <i class="fas fa-copy"></i> Copy Link
+      </button>
+    </div>
+  `;
+  leaderboardList.appendChild(ctaCard);
+  
+  ctaCard.querySelector('#copy-ref-link-btn').addEventListener('click', () => {
+    soundManager.playClick();
+    const refLink = `${window.location.origin}${window.location.pathname}?ref=raas_${Math.random().toString(36).substring(2, 7)}`;
+    navigator.clipboard.writeText(refLink).then(() => {
+      const btn = ctaCard.querySelector('#copy-ref-link-btn');
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      trackProgress('PYROMANIAC', 1);
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+      }, 2000);
+    });
+  });
 }
 
 // Initialize on DOM load

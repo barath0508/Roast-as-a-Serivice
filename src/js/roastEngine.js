@@ -1,5 +1,56 @@
 // Roast Generation Engine - Dual Mode: Gemini AI API & High-Fidelity Heuristics Engine
 
+function tryParseJson(text) {
+  let cleanText = text.trim();
+  if (cleanText.startsWith("```")) {
+    cleanText = cleanText.replace(/^```(json)?/i, "");
+    cleanText = cleanText.replace(/```$/, "");
+    cleanText = cleanText.trim();
+  }
+  
+  try {
+    return JSON.parse(cleanText);
+  } catch (err) {
+    console.error("JSON parsing failed on client:", err);
+    return null;
+  }
+}
+
+function recoverStandardRoast(text) {
+  return {
+    roast: text,
+    score: Math.floor(Math.random() * 30) + 60,
+    cringe: Math.floor(Math.random() * 30) + 60,
+    buzzword: Math.floor(Math.random() * 30) + 60,
+    flags: Math.floor(Math.random() * 30) + 60
+  };
+}
+
+function recoverBattleRoast(text, target1, target2) {
+  let r1 = text;
+  let r2 = "The AI was too stunned by Target 1 to even review Target 2.";
+  const lowerText = text.toLowerCase();
+  
+  if (lowerText.includes(target2.toLowerCase())) {
+    const index = lowerText.indexOf(target2.toLowerCase());
+    r1 = text.substring(0, index).trim();
+    r2 = text.substring(index).trim();
+  } else if (text.includes("\n\n")) {
+    const parts = text.split("\n\n");
+    r1 = parts[0];
+    r2 = parts.slice(1).join("\n\n");
+  }
+
+  return {
+    roast1: r1,
+    roast2: r2,
+    winner: target1,
+    verdict: "The battle collapsed into pure chaos. A default victory is awarded to the initiator.",
+    score1: 80,
+    score2: 70
+  };
+}
+
 // 1. AI API Mode Handler
 async function generateAiRoast(apiKey, category, data, severity, persona) {
   const apiKeys = apiKey.split(",").map(k => k.trim()).filter(Boolean);
@@ -14,16 +65,35 @@ async function generateAiRoast(apiKey, category, data, severity, persona) {
   ];
 
   let subjectDesc = '';
-  if (category === 'github') {
-    subjectDesc = `GitHub Profile for user "${data.username}". Details: Name: ${data.name}, Bio: ${data.bio}, Repos: ${data.reposCount}, Followers: ${data.followers}, Top Languages: ${JSON.stringify(data.languages)}`;
-  } else if (category === 'resume') {
-    subjectDesc = `Resume text: ${data.resumeText}`;
-  } else if (category === 'startup') {
-    subjectDesc = `Startup "${data.startupName}". Pitch: ${data.startupDesc}`;
-  } else if (category === 'code') {
-    subjectDesc = `Code Snippet: \n\`\`\`\n${data.codeText}\n\`\`\``;
+  const isBattle = category === 'battle';
+
+  if (isBattle) {
+    const t1 = data.target1 || 'Target A';
+    const t2 = data.target2 || 'Target B';
+    let d1Desc = '';
+    let d2Desc = '';
+    
+    if (data.type === 'github') {
+      d1Desc = `GitHub User "${t1}". Details: Name: ${data.profile1?.name || t1}, Bio: ${data.profile1?.bio || ''}, Repos: ${data.profile1?.reposCount || 0}, Followers: ${data.profile1?.followers || 0}, Languages: ${JSON.stringify(data.profile1?.languages || [])}`;
+      d2Desc = `GitHub User "${t2}". Details: Name: ${data.profile2?.name || t2}, Bio: ${data.profile2?.bio || ''}, Repos: ${data.profile2?.reposCount || 0}, Followers: ${data.profile2?.followers || 0}, Languages: ${JSON.stringify(data.profile2?.languages || [])}`;
+    } else {
+      d1Desc = `Custom Target "${t1}". Context: ${data.text1 || ''}`;
+      d2Desc = `Custom Target "${t2}". Context: ${data.text2 || ''}`;
+    }
+    
+    subjectDesc = `ROAST BATTLE CONTEXT:\nTarget 1 (Player 1): ${t1}\nDetails 1: ${d1Desc}\n\nTarget 2 (Player 2): ${t2}\nDetails 2: ${d2Desc}`;
   } else {
-    subjectDesc = `Custom target: ${data.target}. Context/details: ${data.text}`;
+    if (category === 'github') {
+      subjectDesc = `GitHub Profile for user "${data.username}". Details: Name: ${data.name}, Bio: ${data.bio}, Repos: ${data.reposCount}, Followers: ${data.followers}, Top Languages: ${JSON.stringify(data.languages)}`;
+    } else if (category === 'resume') {
+      subjectDesc = `Resume text: ${data.resumeText}`;
+    } else if (category === 'startup') {
+      subjectDesc = `Startup "${data.startupName}". Pitch: ${data.startupDesc}`;
+    } else if (category === 'code') {
+      subjectDesc = `Code Snippet: \n\`\`\`\n${data.codeText}\n\`\`\``;
+    } else {
+      subjectDesc = `Custom target: ${data.target}. Context/details: ${data.text}`;
+    }
   }
 
   const severityPrompts = {
@@ -40,15 +110,41 @@ async function generateAiRoast(apiKey, category, data, severity, persona) {
     'genz': 'Sarcastic Gen Z: Minimalist lowercase, heavy skull emoji use (💀), "bruh", "it\'s giving...", "no cap", "who let you cook", "caught in 4k", "side eye", zero punctuation, bored and unimpressed.'
   };
 
-  const systemInstruction = `You are a professional comedian specializing in roasts. You operate the Roast-as-a-Service (RaaS) system.
+  let systemInstruction = '';
+  if (isBattle) {
+    systemInstruction = `You are a professional comedian specializing in roasts. You operate the Roast-as-a-Service (RaaS) system.
+Your task is to host a Roast Battle between the two subjects provided. You must roast both of them individually, declare a winner (one of the target names), and write a hilarious summarizing verdict.
+You must adopt this persona: ${personaPrompts[persona]}
+You must scale the severity to: ${severityPrompts[severity]}
+You must return the output STRICTLY as a single JSON object. Do not write any markdown blocks (like \`\`\`json) or write text before/after the JSON.
+The JSON must have this exact structure:
+{
+  "roast1": "the roast text for target 1 (1-2 paragraphs)",
+  "roast2": "the roast text for target 2 (1-2 paragraphs)",
+  "winner": "the exact name of the winner (MUST match target 1 or target 2 exactly)",
+  "verdict": "a hilarious summary explaining who won, who got burned worse, and why (1 paragraph)",
+  "score1": number (0 to 100, roastability score for target 1),
+  "score2": number (0 to 100, roastability score for target 2)
+}`;
+  } else {
+    systemInstruction = `You are a professional comedian specializing in roasts. You operate the Roast-as-a-Service (RaaS) system.
 Your task is to roast the subject provided.
 You must adopt this persona: ${personaPrompts[persona]}
 You must scale the severity to: ${severityPrompts[severity]}
-Do not include warnings or disclaimers in the output, just output the roast directly. Keep the roast length around 2 to 4 paragraphs, concise and punchy.`;
+You must return the output STRICTLY as a single JSON object. Do not write any markdown blocks (like \`\`\`json) or write text before/after the JSON.
+The JSON must have this exact structure:
+{
+  "roast": "the roast text (2-4 paragraphs, concise, punchy)",
+  "score": number (0 to 100, representing how roastable they are overall),
+  "cringe": number (0 to 100, cringe level),
+  "buzzword": number (0 to 100, buzzword density),
+  "flags": number (0 to 100, red flags count/severity)
+}`;
+  }
 
   const prompt = `${systemInstruction}\n\nSubject to roast:\n${subjectDesc}`;
 
-  let roastText = "";
+  let rawResponseText = "";
   let lastError = "";
   const allErrors = [];
 
@@ -63,7 +159,7 @@ Do not include warnings or disclaimers in the output, just output the roast dire
           body: JSON.stringify({
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
-              temperature: 0.7,
+              temperature: 0.8,
               maxOutputTokens: 2048
             }
           })
@@ -89,8 +185,8 @@ Do not include warnings or disclaimers in the output, just output the roast dire
         }
 
         const data = await response.json();
-        roastText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        if (roastText) {
+        rawResponseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (rawResponseText) {
           break outer;
         }
       } catch (err) {
@@ -101,12 +197,21 @@ Do not include warnings or disclaimers in the output, just output the roast dire
     }
   }
 
-  if (!roastText) {
+  if (!rawResponseText) {
     const tried = defaultModels.join(", ");
     throw new Error(`Roast generation failed across models [${tried}] and ${apiKeys.length} key(s).\nAll Errors:\n${allErrors.join('\n')}`);
   }
 
-  return roastText.trim();
+  const parsed = tryParseJson(rawResponseText);
+  if (parsed) {
+    return parsed;
+  } else {
+    if (isBattle) {
+      return recoverBattleRoast(rawResponseText, data.target1 || 'Target A', data.target2 || 'Target B');
+    } else {
+      return recoverStandardRoast(rawResponseText);
+    }
+  }
 }
 
 // 2. Local Heuristics / Template Engine (Fallback & Default Mode)
@@ -403,44 +508,123 @@ const LOCAL_ROAST_TEMPLATES = {
 function generateLocalHeuristicRoast(category, data, severity, persona) {
   const templates = LOCAL_ROAST_TEMPLATES[persona]?.[category]?.[severity];
   if (!templates || templates.length === 0) {
-    return "Your input is so boring that my roasting engine shut itself down to prevent overheating. Try harder.";
+    return {
+      roast: "Your input is so boring that my roasting engine shut itself down to prevent overheating. Try harder.",
+      score: 50,
+      cringe: 50,
+      buzzword: 50,
+      flags: 50
+    };
   }
 
-  // Pick a random template from the available choices
+  // Pick a random template
   const index = Math.floor(Math.random() * templates.length);
   let text = templates[index];
 
-  // Perform replacements based on category data
+  // Perform replacements
+  let nameSeed = 10;
   if (category === 'github') {
+    const repos = data.reposCount ?? 0;
+    const followers = data.followers ?? 0;
+    const bio = data.bio || '';
+    nameSeed = (data.name || data.username || '').length + repos;
+    
     text = text
       .replace(/{name}/g, data.name || data.username || 'Mysterious Developer')
       .replace(/{username}/g, data.username || 'anonymous')
-      .replace(/{reposCount}/g, data.reposCount ?? 0)
-      .replace(/{followers}/g, data.followers ?? 0)
+      .replace(/{reposCount}/g, repos)
+      .replace(/{followers}/g, followers)
       .replace(/{following}/g, data.following ?? 0)
-      .replace(/{bio}/g, data.bio || 'no bio provided')
+      .replace(/{bio}/g, bio)
       .replace(/{topLang}/g, data.languages && data.languages.length > 0 ? data.languages[0] : 'HTML');
   } else if (category === 'resume') {
-    text = text
-      .replace(/{resumeText}/g, data.resumeText || 'empty paper');
+    nameSeed = (data.resumeText || '').length;
+    text = text.replace(/{resumeText}/g, data.resumeText || 'empty paper');
   } else if (category === 'startup') {
+    nameSeed = (data.startupName || '').length + (data.startupDesc || '').length;
     text = text
       .replace(/{startupName}/g, data.startupName || 'No-Name SaaS')
       .replace(/{startupDesc}/g, data.startupDesc || 'Doing stuff in the cloud');
   } else if (category === 'code') {
-    // Basic analysis on variables if any are found
+    nameSeed = (data.codeText || '').length;
     const varMatches = data.codeText.match(/(?:let|const|var)\s+([a-zA-Z0-9_$]+)/);
     const varName = varMatches ? varMatches[1] : 'x';
     text = text
       .replace(/{codeText}/g, data.codeText || 'no code')
       .replace(/{var}/g, varName);
   } else if (category === 'custom') {
+    nameSeed = (data.target || '').length + (data.text || '').length;
     text = text
       .replace(/{target}/g, data.target || 'The Unknown Victim')
       .replace(/{text}/g, data.text || 'Existing in the background');
   }
 
-  return text;
+  // Calculate scores deterministically based on nameSeed
+  const score = (nameSeed * 7) % 35 + 60;
+  const cringe = (nameSeed * 13) % 40 + 55;
+  const buzzword = (nameSeed * 3) % 45 + 50;
+  const flags = (nameSeed * 9) % 30 + 65;
+
+  return {
+    roast: text,
+    score,
+    cringe,
+    buzzword,
+    flags
+  };
+}
+
+function generateLocalHeuristicBattle(data, severity, persona) {
+  const t1 = data.target1 || 'Target A';
+  const t2 = data.target2 || 'Target B';
+  
+  // Choose winner deterministically based on characters hash code
+  const hash1 = Array.from(t1).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash2 = Array.from(t2).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const winner = hash1 % 2 === 0 ? t1 : t2;
+  const loser = winner === t1 ? t2 : t1;
+
+  const battleRoasts = {
+    gordon: {
+      roast1: `Look at ${t1}! Their setup is completely RAW! It's so raw it's practically still breathing! I've seen better structured projects in a rubbish bin. Absolute kitchen nightmare!`,
+      roast2: `And ${t2}, don't you smile! Your work is completely bland, uninspired, and has absolutely no seasoning. I wouldn't trust you to wash the dishes. Get out of the kitchen!`,
+      verdict: `A brutal match. ${winner} survived because ${loser}'s performance was an absolute embarrassment to the culinary arts.`
+    },
+    vc: {
+      roast1: `${t1} is running a lifestyle project with zero moat, zero network effects, and toxic unit economics. They're burning cash on Google Ads just to get bots to click their landing page.`,
+      roast2: `${t2} has a target addressable market of about 15 people. They are building an entire platform when a simple Google Form would suffice. Pivot immediately!`,
+      verdict: `We decided to pass on both, but ${winner} has slightly better retention metrics than the disaster of ${loser}. Term sheet offered at a seed-level valuation.`
+    },
+    reviewer: {
+      roast1: `${t1} has written a staircase of bad naming choices, global variables, and nested loops with O(N^2) complexity. Cyclomatic complexity is reaching critical meltdown!`,
+      roast2: `${t2}'s commit history looks like a crime scene. Mostly on weekends, probably under the influence of energy drinks. Squash your commits!`,
+      verdict: `${winner} won this duel because ${loser}'s code contains global variables and variable shadowing. Closed branch. Go back to boot camp.`
+    },
+    shakespeare: {
+      roast1: `Hark! ${t1} is a lily-livered knave whose scrolls of code are a plague upon the kingdom. Return to thy chamber and weep!`,
+      roast2: `And thou, ${t2}! A clay-brained rogue fit only for swine. Thy bio is a tragic comedy. Away with thee!`,
+      verdict: `By my troth, the battle is decided! ${winner} did bear the insults with more noble grace than the cowardly ${loser}.`
+    },
+    genz: {
+      roast1: `bruh, who let ${t1} cook? literally NPC energy, caught in 4k side eyes. its giving major unpaid intern vibes 💀`,
+      roast2: `not ${t2} trying so hard but failing side quests in real life. the math isn't mathing. pick a struggle or delete your account 💀`,
+      verdict: `no cap, ${winner} won this battle. ${loser} was caught being absolute clown behavior 💀`
+    }
+  };
+
+  const pTemplates = battleRoasts[persona] || battleRoasts['gordon'];
+
+  const score1 = (hash1 % 30) + 60;
+  const score2 = (hash2 % 30) + 60;
+
+  return {
+    roast1: pTemplates.roast1,
+    roast2: pTemplates.roast2,
+    winner: winner,
+    verdict: pTemplates.verdict,
+    score1: score1,
+    score2: score2
+  };
 }
 
 // 3. Backend Proxy API Fallback Handler
@@ -465,11 +649,7 @@ async function generateBackendAiRoast(category, data, severity, persona) {
     throw new Error(errorText || `Backend server returned HTTP status: ${response.status}`);
   }
 
-  const resData = await response.json();
-  if (!resData || !resData.roast) {
-    throw new Error("Invalid response format received from backend server.");
-  }
-  return resData.roast;
+  return await response.json();
 }
 
 // 4. Exposed main function
@@ -484,7 +664,12 @@ export async function generateRoast({ category, data, severity, persona, aiMode,
     // Return local heuristic roast
     // Simulate a tiny delay for heuristic roast so it feels like it's "grilling"
     await new Promise(resolve => setTimeout(resolve, 800));
-    return generateLocalHeuristicRoast(category, data, severity, persona);
+    
+    if (category === 'battle') {
+      return generateLocalHeuristicBattle(data, severity, persona);
+    } else {
+      return generateLocalHeuristicRoast(category, data, severity, persona);
+    }
   }
 }
 

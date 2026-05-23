@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roastify | Roast as a Service (RaaS) - AI Roast Generator</title>
-  <meta name="description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona. Out-of-the-box AI mode for all.">
-  <meta name="keywords" content="roast, roast as a service, raas, github roast, resume roast, startup roast, code roast, gordon ramsay roast, ai roast generator, roastify">
+  <title>Roastify | #1 AI Roast Generator & Roast as a Service (RaaS)</title>
+  <meta name="description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup pitch, spaghetti code, or custom targets. Run a comparative AI Roast Battle or roast a friend anonymously. Choose Mild, Spicy, or Nuclear burns with Gordon Ramsay, VC Tech Bro, or Gen Z personas. Free, fast, and unhinged.">
+  <meta name="keywords" content="ai roast generator, roast as a service, raas, roast my resume, github roast, startup pitch roast, code roaster, gordon ramsay roast, anonymous roast, free ai roaster, roast battle, roastify, resume checker, github analyzer">
   <meta name="author" content="Roastify team">
   <link rel="canonical" href="https://roastify.service">
   <meta name="robots" content="index, follow">
+  <meta http-equiv="content-language" content="en-US">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   
   <!-- SEO Open Graph / Facebook -->
-  <meta property="og:title" content="Roastify | Roast as a Service (RaaS) - AI Roast Generator">
-  <meta property="og:description" content="Savage AI-powered roasts served piping hot. Roast your GitHub, resume, startup, code, or custom text. Choose your cruelty level and roasting persona.">
+  <meta property="og:title" content="Roastify | #1 AI Roast Generator & Roast as a Service (RaaS)">
+  <meta property="og:description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona. Out-of-the-box AI mode for all.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://roastify.service/">
   <meta property="og:image" content="https://roastify.service/assets/og-image.png">
@@ -20,7 +22,7 @@
   <!-- Twitter Card -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://roastify.service/">
-  <meta property="twitter:title" content="Roastify | Roast as a Service (RaaS) - AI Roast Generator">
+  <meta property="twitter:title" content="Roastify | #1 AI Roast Generator & Roast as a Service (RaaS)">
   <meta property="twitter:description" content="Savage AI-powered roasts served piping hot. Roast your GitHub profile, resume, startup, code, or custom text. Choose your cruelty level and roasting persona.">
   <meta property="twitter:image" content="https://roastify.service/assets/og-image.png">
 
@@ -61,7 +63,52 @@
       "Startup Pitch Roast Teardown",
       "Spaghetti Code Roaster",
       "Custom Persona Selection",
-      "Cruelty Severity Levels"
+      "Cruelty Severity Levels",
+      "Roast Battle Mode",
+      "Hall of Shame Leaderboard",
+      "Milestone Achievements"
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD FAQ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Roast as a Service (RaaS)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Roast as a Service (RaaS) is an AI-powered entertainment platform that generates savage, witty, and customized roasts for GitHub profiles, professional resumes, startup ideas, code snippets, and custom topics based on user-configured personas like Gordon Ramsay or a Tech Bro VC."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the AI Roast Generator work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The AI Roast Generator uses advanced LLMs (like Google Gemini) combined with customized prompts and personas to dissect your inputs. It analyzes details such as repository count, code complexity, or startup pitches and formulates highly specific, hilarious teardowns."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I roast my GitHub or Resume anonymously?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! You can generate an anonymous roast request link for a friend. They will receive a notification that they have been requested to be roasted and can choose to submit their profile or text details to see the burn."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my resume or code data safe?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. Roastify does not save your resume texts, startup pitches, or code snippets on any server database. Your roast history is stored completely locally in your browser's localStorage, keeping your data entirely under your own control."
+        }
+      }
     ]
   }
   </script>
@@ -88,6 +135,13 @@
     <div class="header-actions">
       <button id="sound-toggle" class="header-btn" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
         <i class="fas fa-volume-high"></i>
+      </button>
+      <button id="leaderboard-toggle-btn" class="header-btn" title="View Hall of Shame" aria-label="View Hall of Shame">
+        <i class="fas fa-ranking-star"></i>
+      </button>
+      <button id="achievements-toggle-btn" class="header-btn" title="View Achievements" aria-label="View Achievements">
+        <i class="fas fa-trophy"></i>
+        <span id="achievements-badge" class="badge hidden">0</span>
       </button>
       <button id="history-toggle-btn" class="header-btn" title="View Roast History" aria-label="View Roast History">
         <i class="fas fa-history"></i>
@@ -123,6 +177,9 @@
           </button>
           <button class="tab-btn" data-tab="custom" id="tab-custom-btn">
             <i class="fas fa-align-left"></i> <span>Custom</span>
+          </button>
+          <button class="tab-btn" data-tab="battle" id="tab-battle-btn">
+            <i class="fas fa-hand-fists"></i> <span>Battle</span>
           </button>
         </div>
 
@@ -164,6 +221,56 @@
             <label for="custom-text" class="input-label">Custom Details / Context</label>
             <textarea id="custom-text" rows="4" placeholder="Tell us about their terrible fashion sense, their annoying habit, or their life choices..."></textarea>
             <p class="input-desc">Give us the ammunition. We'll do the rest.</p>
+          </div>
+
+          <div class="tab-content" id="tab-battle">
+            <label class="input-label">Battle Mode Type</label>
+            <div class="battle-type-selector mb-3">
+              <label class="radio-container">
+                <input type="radio" name="battle-type" value="github" checked>
+                <span class="radio-label"><i class="fab fa-github"></i> GitHub Profiles</span>
+              </label>
+              <label class="radio-container">
+                <input type="radio" name="battle-type" value="custom">
+                <span class="radio-label"><i class="fas fa-user-ninja"></i> Custom Targets</span>
+              </label>
+            </div>
+            
+            <div class="battle-inputs-grid">
+              <div class="battle-player-panel">
+                <h4 class="player-title">Contestant 1</h4>
+                <div class="battle-github-fields">
+                  <label for="battle-github-1" class="input-label-sm">GitHub Username</label>
+                  <div class="input-group-sm">
+                    <input type="text" id="battle-github-1" placeholder="e.g. torvalds" autocomplete="off">
+                  </div>
+                </div>
+                <div class="battle-custom-fields hidden">
+                  <label for="battle-custom-name-1" class="input-label-sm">Name</label>
+                  <input type="text" id="battle-custom-name-1" placeholder="e.g. John Doe" class="mb-2" autocomplete="off">
+                  <label for="battle-custom-desc-1" class="input-label-sm">Context</label>
+                  <textarea id="battle-custom-desc-1" rows="2" placeholder="e.g. Annoying habits..."></textarea>
+                </div>
+              </div>
+              
+              <div class="battle-vs-divider">VS</div>
+              
+              <div class="battle-player-panel">
+                <h4 class="player-title">Contestant 2</h4>
+                <div class="battle-github-fields">
+                  <label for="battle-github-2" class="input-label-sm">GitHub Username</label>
+                  <div class="input-group-sm">
+                    <input type="text" id="battle-github-2" placeholder="e.g. yyx990803" autocomplete="off">
+                  </div>
+                </div>
+                <div class="battle-custom-fields hidden">
+                  <label for="battle-custom-name-2" class="input-label-sm">Name</label>
+                  <input type="text" id="battle-custom-name-2" placeholder="e.g. Jane Doe" class="mb-2" autocomplete="off">
+                  <label for="battle-custom-desc-2" class="input-label-sm">Context</label>
+                  <textarea id="battle-custom-desc-2" rows="2" placeholder="e.g. Crypto enthusiast..."></textarea>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Configuration Section -->
@@ -268,6 +375,40 @@
           </div>
         </div>
 
+        <!-- Roast Score Panel -->
+        <div id="roast-score-panel" class="roast-score-panel hidden">
+          <div class="score-overall-container">
+            <div class="score-circle-wrapper">
+              <svg class="score-svg-circle" viewBox="0 0 100 100">
+                <circle class="score-circle-bg" cx="50" cy="50" r="40"></circle>
+                <circle id="score-circle-fill" class="score-circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+              </svg>
+              <div id="score-number-display" class="score-number">0</div>
+            </div>
+            <div class="score-overall-text">
+              <h4>ROASTABLE SCORE</h4>
+              <p id="score-rating-text">COLD</p>
+            </div>
+          </div>
+          <div class="score-breakdown-container">
+            <div class="score-metric">
+              <span class="metric-label">Cringe Factor</span>
+              <div class="metric-bar-bg"><div id="metric-cringe-fill" class="metric-bar-fill cringe-color" style="width: 0%;"></div></div>
+              <span id="metric-cringe-val" class="metric-val">0%</span>
+            </div>
+            <div class="score-metric">
+              <span class="metric-label">Buzzword Density</span>
+              <div class="metric-bar-bg"><div id="metric-buzzword-fill" class="metric-bar-fill buzzword-color" style="width: 0%;"></div></div>
+              <span id="metric-buzzword-val" class="metric-val">0%</span>
+            </div>
+            <div class="score-metric">
+              <span class="metric-label">Red Flags</span>
+              <div class="metric-bar-bg"><div id="metric-flags-fill" class="metric-bar-fill flags-color" style="width: 0%;"></div></div>
+              <span id="metric-flags-val" class="metric-val">0%</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Action Panel -->
         <div class="action-panel disabled" id="output-actions">
           <button class="action-btn" id="copy-roast-btn" title="Copy Roast Text">
@@ -284,6 +425,77 @@
 
     </div>
   </main>
+
+  <!-- Detailed SEO Features & FAQ Section -->
+  <section class="seo-info-container">
+    <div class="seo-grid">
+      <!-- Explanatory Text Column -->
+      <div class="seo-text-column glass-panel">
+        <h2>What is Roast as a Service (RaaS)?</h2>
+        <p>
+          Welcome to <strong>Roastify</strong>, the internet's premier <strong>AI Roast Generator</strong>. Whether you need a hilarious reality check on your <strong>GitHub profile</strong> commit graph, an unhinged breakdown of your <strong>resume buzzwords</strong>, a critique of your <strong>startup pitch deck</strong>, or a teardown of your <strong>spaghetti code snippet</strong>, our system serves them piping hot.
+        </p>
+        <p>
+          RaaS is built on top of high-fidelity large language models (LLMs) like Google Gemini, wrapped in customized personas including <em>Gordon Ramsay</em>, a <em>Silicon Valley VC Bro</em>, a <em>Condescending Code Reviewer</em>, and a sarcastic <em>Gen Z slacker</em>. Customize your severity from a playful Mild poke to Spicy sarcasm, all the way to a Nuclear meltdown.
+        </p>
+        <h3>Core Features:</h3>
+        <ul>
+          <li><strong>GitHub Profile Roaster:</strong> Extracts repos, languages, and followers to roast your developer credentials.</li>
+          <li><strong>Resume Analyzer & Roaster:</strong> Dissects job histories and buzzwords to highlight corporate cringe.</li>
+          <li><strong>Startup Teardown:</strong> Evaluates your pitch to target weak moats and CAC projections.</li>
+          <li><strong>Spaghetti Code Blaster:</strong> Reviews complexity, nested loops, and structural debt.</li>
+          <li><strong>Roast Battle Mode:</strong> Put two profiles head-to-head and let AI decide the victor!</li>
+        </ul>
+      </div>
+
+      <!-- FAQ Accordion Column -->
+      <div class="seo-faq-column glass-panel">
+        <h3>Frequently Asked Questions</h3>
+        
+        <div class="faq-accordion">
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>Is my code or resume text saved?</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">
+              <p>No. Your privacy is paramount. Roastify operates strictly on-demand. Your inputs are sent to the AI engine to generate the roast, and all history, scores, and achievement states are saved purely in your local browser storage (localStorage). We do not run databases or log your personal data.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>How do I roast a friend anonymously?</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">
+              <p>Simply navigate to the "Custom" tab, input their name/identifier, and click "Generate Anonymous Roast Link for Friend." This copies a sharing link to your clipboard. Send it to them, and they'll land on a customized screen showing they've been requested to be roasted.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>How do Roast Battles work?</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">
+              <p>In Roast Battle Mode, you input two targets—either GitHub profiles or custom names. The AI roasts both individually, calculates comparative scores, writes a funny summary, and declares one the definitive winner of the duel.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>Are there rewards for unlocking achievements?</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">
+              <p>Yes! Every unlocked milestone unlocks custom developer titles (such as "Gladiator of Shame" or "Nuclear Waste") that appear inside your Achievement Vault. Plus, you get a premium synthesized Web Audio arpeggio notification chime each time you unlock one.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Roast Card Template (hidden, used for generating download image) -->
   <div id="roast-card-export" class="roast-card-export-hidden">
@@ -305,6 +517,14 @@
     </div>
   </div>
 
+  <!-- Anonymous request banner -->
+  <div id="anon-banner" class="anon-banner hidden">
+    <div class="anon-banner-content">
+      <i class="fas fa-mask icon-glow"></i>
+      <span>Someone requested you get roasted anonymously! Choose your target inputs.</span>
+    </div>
+  </div>
+
   <!-- History Sidebar Drawer -->
   <div class="history-drawer-overlay" id="history-overlay"></div>
   <aside class="history-drawer" id="history-drawer">
@@ -323,6 +543,36 @@
         <i class="fas fa-box-open empty-icon"></i>
         <p>No emotional damage logged yet.</p>
       </div>
+    </div>
+  </aside>
+
+  <!-- Achievements Drawer -->
+  <div class="history-drawer-overlay" id="achievements-overlay"></div>
+  <aside class="history-drawer" id="achievements-drawer">
+    <div class="drawer-header">
+      <h3><i class="fas fa-trophy"></i> Achievement Vault</h3>
+      <button id="close-achievements-btn" class="close-btn" aria-label="Close Achievements Panel">&times;</button>
+    </div>
+    <div class="drawer-actions" style="justify-content: space-between; align-items: center;">
+      <span id="achievements-progress-text" style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted);">Unlocked: 0/7</span>
+      <button id="reset-achievements-btn" class="clear-all-btn" style="color: var(--text-muted);">
+        <i class="fas fa-rotate-left"></i> Reset
+      </button>
+    </div>
+    <div class="drawer-body" id="achievements-list">
+      <!-- Filled dynamically -->
+    </div>
+  </aside>
+
+  <!-- Leaderboard Drawer -->
+  <div class="history-drawer-overlay" id="leaderboard-overlay"></div>
+  <aside class="history-drawer" id="leaderboard-drawer">
+    <div class="drawer-header">
+      <h3><i class="fas fa-ranking-star"></i> Hall of Shame</h3>
+      <button id="close-leaderboard-btn" class="close-btn" aria-label="Close Leaderboard Panel">&times;</button>
+    </div>
+    <div class="drawer-body" id="leaderboard-list">
+      <!-- Filled dynamically -->
     </div>
   </aside>
 
