@@ -299,6 +299,7 @@ function init() {
   // Initial Renderings
   renderHistory();
   updateAchievementsBadge();
+  setupFaqAccordion();
 }
 
 // Sound icon updater
@@ -1242,6 +1243,24 @@ function renderLeaderboard() {
       setTimeout(() => {
         btn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
       }, 2000);
+    });
+  });
+}
+
+function setupFaqAccordion() {
+  const faqQuestions = document.querySelectorAll('.faq-question');
+  faqQuestions.forEach(q => {
+    q.addEventListener('click', () => {
+      soundManager.playClick();
+      const item = q.parentElement;
+      const isOpen = item.classList.contains('active');
+      
+      // Close all first
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+      
+      if (!isOpen) {
+        item.classList.add('active');
+      }
     });
   });
 }
