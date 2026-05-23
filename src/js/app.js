@@ -1392,16 +1392,22 @@ function renderLeaderboard() {
 function setupFaqAccordion() {
   const faqQuestions = document.querySelectorAll('.faq-question');
   faqQuestions.forEach(q => {
+    q.setAttribute('aria-expanded', 'false');
     q.addEventListener('click', () => {
       soundManager.playClick();
       const item = q.parentElement;
       const isOpen = item.classList.contains('active');
       
       // Close all first
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('active');
+        const btn = i.querySelector('.faq-question');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
       
       if (!isOpen) {
         item.classList.add('active');
+        q.setAttribute('aria-expanded', 'true');
       }
     });
   });

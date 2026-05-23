@@ -148,7 +148,8 @@
   <header class="app-header">
     <div class="logo-container">
       <div class="fire-icon-wrapper">
-        <svg class="fire-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+        <svg class="fire-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Roastify Flame Logo">
+          <title>Roastify Flame Logo</title>
           <path class="flame-outer" d="M50,120 C80,120 100,90 100,60 C100,25 70,0 50,0 C30,0 0,25 0,60 C0,90 20,120 50,120 Z" />
           <path class="flame-middle" d="M50,120 C70,120 85,98 85,75 C85,45 65,20 50,20 C35,20 15,45 15,75 C15,98 30,120 50,120 Z" />
           <path class="flame-inner" d="M50,120 C60,120 70,105 70,90 C70,70 60,50 50,50 C40,50 30,70 30,90 C30,105 40,120 50,120 Z" />
@@ -241,7 +242,7 @@
           </div>
 
           <div class="tab-content" id="tab-custom">
-            <label for="custom-text" class="input-label">Who/What are we roasting?</label>
+            <label for="custom-target" class="input-label">Who/What are we roasting?</label>
             <input type="text" id="custom-target" placeholder="e.g. My roommate, Crypto bro, etc." class="mb-3" autocomplete="off">
             <label for="custom-text" class="input-label">Custom Details / Context</label>
             <textarea id="custom-text" rows="4" placeholder="Tell us about their terrible fashion sense, their annoying habit, or their life choices..."></textarea>
@@ -301,7 +302,7 @@
           <!-- Configuration Section -->
           <div class="config-section">
             <!-- Severity Selector -->
-            <div class="config-group">
+            <div class="config-group full-width">
               <label class="input-label">Severity Level</label>
               <div class="severity-container">
                 <input type="range" id="severity-slider" min="1" max="3" value="2" class="severity-slider">
@@ -425,7 +426,8 @@
         <div id="roast-score-panel" class="roast-score-panel hidden">
           <div class="score-overall-container">
             <div class="score-circle-wrapper">
-              <svg class="score-svg-circle" viewBox="0 0 100 100">
+              <svg class="score-svg-circle" viewBox="0 0 100 100" role="img" aria-label="Roastable Score Gauge">
+                <title>Roastable Score Gauge</title>
                 <circle class="score-circle-bg" cx="50" cy="50" r="40"></circle>
                 <circle id="score-circle-fill" class="score-circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
               </svg>

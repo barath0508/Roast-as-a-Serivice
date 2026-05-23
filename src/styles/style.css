@@ -485,11 +485,15 @@ textarea.code-font {
 /* Config Section inside Form */
 .config-section {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.config-group.full-width {
+  grid-column: span 2;
 }
 
 .config-group {
@@ -1336,11 +1340,20 @@ textarea.code-font {
     display: none;
   }
   .roast-form {
-    padding: 1.2rem;
+    padding: 1rem;
   }
   .config-section {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.2rem;
+  }
+  .config-group.full-width {
+    grid-column: span 1;
+  }
+  .terminal-body {
+    padding: 1rem;
+  }
+  .panel-header {
+    padding: 1.2rem 1.2rem 0.8rem;
   }
   .history-drawer {
     width: 100%;
@@ -1358,6 +1371,9 @@ textarea.code-font {
     grid-template-columns: 1fr;
     gap: 0.8rem;
     text-align: center;
+  }
+  .battle-score-display {
+    justify-content: center;
   }
   .battle-score-vs {
     margin: 4px 0;
@@ -1377,6 +1393,20 @@ textarea.code-font {
     align-items: center;
     padding: 1rem;
     text-align: center;
+  }
+  .action-panel {
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    flex: 1 1 50%;
+    padding: 12px;
+    font-size: 0.82rem;
+  }
+  .action-btn:last-child {
+    flex: 1 1 100%;
+    border-bottom: none;
   }
   .main-container {
     padding: 0 1rem;
@@ -1738,6 +1768,23 @@ textarea.code-font {
   width: 100%;
 }
 
+.battle-custom-fields input[type="text"] {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  width: 100%;
+  transition: all var(--transition-fast);
+}
+
+.battle-custom-fields input[type="text"]:focus {
+  border-color: rgba(hsl(var(--accent)), 0.4);
+  box-shadow: 0 0 10px rgba(hsl(var(--accent)), 0.15);
+  outline: none;
+}
+
 .battle-vs-divider {
   display: flex;
   align-items: center;
@@ -1747,6 +1794,7 @@ textarea.code-font {
   font-size: 1.2rem;
   color: hsl(var(--accent));
   align-self: center;
+  justify-self: center;
   width: 40px;
   height: 40px;
   border-radius: 50%;
