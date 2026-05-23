@@ -165,9 +165,8 @@ Do not write markdown blocks or text before/after the JSON.`;
             const errorText = await response.text();
             lastError = errorText.length > 500 ? errorText.substring(0, 500) + '...[truncated]' : errorText;
             allErrors.push(`[${model}] ${response.status}: ${lastError}`);
-            const isKeyError = response.status === 429 || response.status === 403 || lastError.includes("API_KEY_INVALID") || lastError.includes("API key expired");
-            if (isKeyError) continue;
-            break;
+            console.warn(`[RoastServer] Error (${response.status}) on model ${model} with current key in comeback. Trying next key...`);
+            continue; // Try next key
           }
           const resJson = await response.json();
           rawResponseText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -312,17 +311,8 @@ The JSON must have this exact structure:
           const errorText = await response.text();
           lastError = errorText.length > 500 ? errorText.substring(0, 500) + '...[truncated]' : errorText;
           allErrors.push(`[${model}] ${response.status}: ${lastError}`);
-
-          const isKeyError =
-            response.status === 429 ||
-            response.status === 403 ||
-            lastError.includes("API_KEY_INVALID") ||
-            lastError.includes("API key expired");
-
-          if (isKeyError) {
-            continue;
-          }
-          break; // Try next model
+          console.warn(`[RoastServer] Error (${response.status}) on model ${model} with current key. Trying next key...`);
+          continue; // Try next key
         }
 
         const resJson = await response.json();

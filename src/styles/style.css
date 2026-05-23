@@ -3042,4 +3042,103 @@ textarea.code-font {
   color: var(--text-main);
 }
 
+/* ================================================================
+   Share Options Modal Styling
+   ================================================================ */
+.share-opt-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  padding: 14px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-main);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all var(--transition-fast);
+}
+
+.share-opt-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.share-opt-btn:active {
+  transform: translateY(1px);
+}
+
+/* Platform branding colors for icons */
+#share-opt-copy i { color: hsl(var(--accent)); }
+#share-opt-twitter i { color: #1da1f2; }
+#share-opt-whatsapp i { color: #25d366; }
+#share-opt-linkedin i { color: #0a66c2; }
+
+.share-url-container {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.share-url-container input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  width: 100%;
+  cursor: text;
+}
+
+#share-url-copy-btn {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+#share-url-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ================================================================
+   Disclaimer Modal "Do Not Show Again" Checkbox Styling
+   ================================================================ */
+.disclaimer-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  font-weight: 600;
+  user-select: none;
+}
+
+.disclaimer-checkbox-container input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: hsl(var(--accent));
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+}
+
+
 

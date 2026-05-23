@@ -188,19 +188,8 @@ The JSON must have this exact structure:
           const errorText = await response.text();
           lastError = errorText.length > 500 ? errorText.substring(0, 500) + '...[truncated]' : errorText;
           allErrors.push(`[${model}] ${response.status}: ${lastError}`);
-
-          const isKeyError =
-            response.status === 429 ||
-            response.status === 403 ||
-            lastError.includes("API_KEY_INVALID") ||
-            lastError.includes("API key expired");
-
-          if (isKeyError) {
-            console.warn(`[RoastEngine] Key error (${response.status}) on model ${model}. Trying next key...`);
-            continue;
-          }
-          console.warn(`[RoastEngine] Model error (${response.status}) on model ${model}. Trying next model...`);
-          break; // Break the key loop, try next model
+          console.warn(`[RoastEngine] Error (${response.status}) on model ${model} with current key. Trying next key...`);
+          continue; // Try next key
         }
 
         const data = await response.json();

@@ -768,6 +768,44 @@
     </div>
   </div>
 
+  <!-- Share Options Modal -->
+  <div id="share-modal" class="info-modal-overlay hidden">
+    <div class="info-modal" style="max-width: 460px;">
+      <button id="share-modal-close" class="info-modal-close" aria-label="Close Share Modal">&times;</button>
+      <h3 id="share-modal-title" class="info-modal-title"><i class="fas fa-share-nodes"></i> Share Roast</h3>
+      <div class="info-modal-body">
+        <p style="margin-bottom: 20px; text-align: center;">Spread the burn! Choose how you want to share this masterpiece:</p>
+        
+        <!-- System Native Share button if supported -->
+        <button id="share-native-btn" class="ignite-btn hidden" style="width: 100%; margin-bottom: 16px; margin-top: 0; padding: 14px; border-radius: var(--radius-md);">
+          <span class="btn-text" style="font-size: 1rem;"><i class="fas fa-share-alt"></i> Share via System</span>
+        </button>
+
+        <div class="share-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+          <button id="share-opt-copy" class="share-opt-btn">
+            <i class="fas fa-copy"></i> Copy Link
+          </button>
+          <button id="share-opt-twitter" class="share-opt-btn">
+            <i class="fab fa-x-twitter"></i> Share on X
+          </button>
+          <button id="share-opt-whatsapp" class="share-opt-btn">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+          </button>
+          <button id="share-opt-linkedin" class="share-opt-btn">
+            <i class="fab fa-linkedin"></i> LinkedIn
+          </button>
+        </div>
+
+        <div class="share-url-container">
+          <input type="text" id="share-url-input" readonly value="">
+          <button id="share-url-copy-btn" class="header-btn" title="Copy to Clipboard">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Sound Toggle Script & Libraries -->
   <script src="src/js/soundManager.js" type="module"></script>
   <script src="src/js/roastEngine.js" type="module"></script>
