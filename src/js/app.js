@@ -1,3 +1,4 @@
+import './analytics.js';
 import soundManager from './soundManager.js';
 import generateRoast from './roastEngine.js';
 import { trackProgress, forceUnlock, getAchievementsList, getAchievementsSummary, resetAchievements, handleReferralCheck } from './achievements.js';
