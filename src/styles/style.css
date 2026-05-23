@@ -1273,6 +1273,7 @@ textarea.code-font {
 @media (max-width: 1024px) {
   .main-container {
     padding: 0 1.5rem;
+    margin: 1rem auto;
   }
   .app-header {
     padding: 1.2rem 1.5rem;
@@ -1286,16 +1287,35 @@ textarea.code-font {
     min-height: auto;
   }
   .terminal-body {
-    min-height: 350px;
+    min-height: 380px;
   }
 }
 
 @media (max-width: 600px) {
   .logo-container h1 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .header-btn {
+    padding: 8px 10px;
+    font-size: 0.95rem;
+  }
+  .header-btn .badge {
+    top: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
   }
   .tabs-container {
     padding: 0.6rem 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .tabs-container::-webkit-scrollbar {
+    display: none;
   }
   .roast-form {
     padding: 1.2rem;
@@ -1307,6 +1327,52 @@ textarea.code-font {
   .history-drawer {
     width: 100%;
     right: -100%;
+  }
+  .battle-inputs-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  .battle-vs-divider {
+    margin: 8px auto;
+  }
+  .battle-score-panel {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    text-align: center;
+  }
+  .battle-score-vs {
+    margin: 4px 0;
+  }
+  .anon-banner {
+    padding: 8px 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    padding: 1rem;
+    text-align: center;
+  }
+  .main-container {
+    padding: 0 1rem;
+  }
+  .roast-score-panel {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    justify-items: center;
+  }
+  .score-overall-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  .score-breakdown-container {
+    width: 100%;
   }
 }
 
