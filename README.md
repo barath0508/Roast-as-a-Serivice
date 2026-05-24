@@ -1,6 +1,6 @@
 # Roastify 🔥 — Roast as a Service (RaaS)
 
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-black?style=flat&logo=vercel)](https://roast-as-a-serivice.vercel.app/)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-black?style=flat&logo=vercel)](https://roastify-app.vercel.app/)
 [![Build Status](https://img.shields.io/badge/Vite-Build--Success-green?style=flat&logo=vite)](https://github.com/barath0508/Roast-as-a-Serivice)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
@@ -8,7 +8,7 @@
 
 **Roastify** is a premium, unhinged, and highly interactive AI-powered entertainment platform that serves savage, witty, and customized roasts for developers, job hunters, and startup founders. RaaS combines modern glassmorphic web design, gamified progression systems, retro Web Audio soundscapes, and Google Gemini LLM integrations into a complete, release-ready web application.
 
-🚀 **Live Demo:** [https://roast-as-a-serivice.vercel.app/](https://roast-as-a-serivice.vercel.app/)
+🚀 **Live Demo:** [https://roastify-app.vercel.app/](https://roastify-app.vercel.app/)
 
 ---
 

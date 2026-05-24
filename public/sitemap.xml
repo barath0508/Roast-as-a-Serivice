@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://roast-as-a-serivice.vercel.app/</loc>
+    <loc>https://roastify-app.vercel.app/</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://roast-as-a-serivice.vercel.app/guides/best-ai-roast-generators</loc>
+    <loc>https://roastify-app.vercel.app/guides/best-ai-roast-generators</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://roast-as-a-serivice.vercel.app/guides/how-to-roast-friends-github</loc>
+    <loc>https://roastify-app.vercel.app/guides/how-to-roast-friends-github</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://roast-as-a-serivice.vercel.app/guides/tamil-roast-lines-developers</loc>
+    <loc>https://roastify-app.vercel.app/guides/tamil-roast-lines-developers</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://roast-as-a-serivice.vercel.app/guides/spaghetti-code-teardown</loc>
+    <loc>https://roastify-app.vercel.app/guides/spaghetti-code-teardown</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://roast-as-a-serivice.vercel.app/guides/pitch-deck-teardown</loc>
+    <loc>https://roastify-app.vercel.app/guides/pitch-deck-teardown</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
