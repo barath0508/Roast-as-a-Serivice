@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Roast Your Friends’ GitHub Profiles (Ethically) | Roastify</title>
+  <meta name="description" content="Learn how to roast your friends' GitHub profiles ethically. Explore our anonymous request features and start developer banter with Roastify.">
+  <meta name="keywords" content="github roast, roast my github, github roast tool, ai roast generator, developer humor">
+  <link rel="canonical" href="https://roast-as-a-serivice.vercel.app/guides/how-to-roast-friends-github">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --font-main: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --bg-main: #0a0b10;
+      --card-bg: rgba(16, 18, 27, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: 230, 57, 0; /* Deep Spicy Red-Orange */
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      line-height: 1.7;
+    }
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .orb-1 { width: 400px; height: 400px; background: rgba(var(--accent), 0.1); top: -100px; left: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(255, 119, 0, 0.06); bottom: -150px; right: -100px; }
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, rgb(var(--accent)) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(var(--accent), 0.5);
+      color: rgb(var(--accent));
+    }
+    .guide-container {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 2.5rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.25; }
+    .meta-info { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 2rem; font-family: var(--font-mono); }
+    h2 { font-size: 1.6rem; margin-top: 2rem; margin-bottom: 1rem; color: #ffffff; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem; }
+    p { margin-bottom: 1.5rem; color: #d1d5db; }
+    ul { margin-bottom: 1.5rem; padding-left: 1.5rem; color: #d1d5db; }
+    li { margin-bottom: 0.5rem; }
+    .cta-box {
+      background: rgba(var(--accent), 0.05);
+      border: 1px solid rgba(var(--accent), 0.2);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin: 2.5rem 0;
+      text-align: center;
+    }
+    .cta-box h3 { margin-top: 0; color: #ffffff; font-size: 1.3rem; }
+    .cta-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffffff 0%, rgb(var(--accent)) 100%);
+      color: #000000;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 800;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(var(--accent), 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(var(--accent), 0.5); }
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.82rem; border-top: 1px solid rgba(255, 255, 255, 0.05); max-width: 900px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header class="app-header">
+    <a href="/" class="logo-container">
+      <div class="logo-title">ROASTIFY</div>
+    </a>
+    <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Back to App</a>
+  </header>
+
+  <main class="guide-container">
+    <h1>How to Roast Your Friends’ GitHub Profiles (Ethically)</h1>
+    <div class="meta-info">Published: May 2026 | Author: Roastify Creator | Category: AI Guides</div>
+
+    <p>There is nothing like a little friendly banter to keep a development team grounded. A developer's commit graph is their digital pride and joy—dense green grids representing hours of hard work, structured pulls, and refactored logic. But sometimes, it's also a source of massive tech pride that is ripe for a lighthearted roast.</p>
+
+    <p>Using our custom <strong>GitHub roast tool</strong>, you can generate hilarious, detailed teardowns of public profiles. Here is how to do it ethically and get the best laughs out of your teammates.</p>
+
+    <h2>The Rules of Ethical Roasting</h2>
+    <p>Comedy is about punchlines, not harassment. Before roasting a coworker or friend, keep these guidelines in mind:
+      <ul>
+        <li><strong>Focus on Code, Not Character</strong>: Keep the roast targeted at public variables, commit graph spaces, programming languages, and formatting choices. Avoid personal insults.</li>
+        <li><strong>Ensure Consent</strong>: Make sure the target is someone who appreciates developer memes and self-deprecating programmer humor.</li>
+        <li><strong>Share the Fun</strong>: Don't keep the results private! Sharing the card or link in your team Slack allows everyone to laugh along.</li>
+      </ul>
+    </p>
+
+    <h2>Generating Anonymous Requests</h2>
+    <p>Want to poke a teammate without exposing yourself? Roastify features an **Anonymous Request Link** generator:
+      <ol>
+        <li>Go to the **Custom** tab on the dashboard.</li>
+        <li>Input your friend's handle or nickname.</li>
+        <li>Click *Generate Anonymous Roast Link for Friend*.</li>
+        <li>Send the copied link to them. When they open it, a custom mask banner alerts them that a peer has requested they get roasted, prompting them to feed the grill!</li>
+      </ol>
+    </p>
+
+    <h2>What the AI Evaluates</h2>
+    <p>When you feed a GitHub profile to our engine, it fetches public variables via the API. It analyzes:
+      <ul>
+        <li><strong>Commit Densities</strong>: The gaps between pushes (moking their weekend slacking or sudden late-night bursts).</li>
+        <li><strong>Language Ratios</strong>: Moking their reliance on CSS, Python scripting, or endless React imports.</li>
+        <li><strong>Public Repos</strong>: The ratio of empty template repos to actual finished systems.</li>
+      </ul>
+    </p>
+
+    <div class="cta-box">
+      <h3>Ready to send a savage review to your coworker?</h3>
+      <p>Enter their username, pick a severity level, and ignite the grill with our custom roaster personas.</p>
+      <a href="/" class="cta-link">Launch the GitHub Roast Tool Now</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Roastify (Roast as a Service). All rights reserved.</p>
+  </footer>
+</body>
+</html>

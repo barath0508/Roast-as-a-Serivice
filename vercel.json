@@ -8,6 +8,10 @@
       "destination": "/api/:path*"
     },
     {
+      "source": "/guides/:path*",
+      "destination": "/guides/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

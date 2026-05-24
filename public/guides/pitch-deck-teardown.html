@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pitch Deck Teardowns: What VCs Actually Think of Your Startup Idea | Roastify</title>
+  <meta name="description" content="Explore startup pitch teardowns. Learn how Silicon Valley VCs evaluate economic models, moats, and CAC targets, and how Roastify reviews pitches.">
+  <meta name="keywords" content="pitch deck teardown, startup roast, vc pitch review, roast as a service, raas, startup founder memes">
+  <link rel="canonical" href="https://roast-as-a-serivice.vercel.app/guides/pitch-deck-teardown">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --font-main: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --bg-main: #0a0b10;
+      --card-bg: rgba(16, 18, 27, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: 230, 57, 0; /* Deep Spicy Red-Orange */
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      line-height: 1.7;
+    }
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .orb-1 { width: 400px; height: 400px; background: rgba(var(--accent), 0.1); top: -100px; left: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(255, 119, 0, 0.06); bottom: -150px; right: -100px; }
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, rgb(var(--accent)) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(var(--accent), 0.5);
+      color: rgb(var(--accent));
+    }
+    .guide-container {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 2.5rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.25; }
+    .meta-info { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 2rem; font-family: var(--font-mono); }
+    h2 { font-size: 1.6rem; margin-top: 2rem; margin-bottom: 1rem; color: #ffffff; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem; }
+    p { margin-bottom: 1.5rem; color: #d1d5db; }
+    ul { margin-bottom: 1.5rem; padding-left: 1.5rem; color: #d1d5db; }
+    li { margin-bottom: 0.5rem; }
+    .cta-box {
+      background: rgba(var(--accent), 0.05);
+      border: 1px solid rgba(var(--accent), 0.2);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin: 2.5rem 0;
+      text-align: center;
+    }
+    .cta-box h3 { margin-top: 0; color: #ffffff; font-size: 1.3rem; }
+    .cta-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffffff 0%, rgb(var(--accent)) 100%);
+      color: #000000;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 800;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(var(--accent), 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(var(--accent), 0.5); }
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.82rem; border-top: 1px solid rgba(255, 255, 255, 0.05); max-width: 900px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header class="app-header">
+    <a href="/" class="logo-container">
+      <div class="logo-title">ROASTIFY</div>
+    </a>
+    <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Back to App</a>
+  </header>
+
+  <main class="guide-container">
+    <h1>Pitch Deck Teardowns: What VCs Actually Think of Your Startup Idea</h1>
+    <div class="meta-info">Published: May 2026 | Author: Roastify Creator | Category: AI Guides</div>
+
+    <p>Starting a company is hard, but pitching it is often harder. Founders spend weeks tweaking deck margins, writing bold claims about TAM (Total Addressable Market), and drafting graphs showing hockey-stick growth. But when you pitch to a Venture Capitalist (VC), they filter your pitch through a highly critical, buzzword-fatigued lens.</p>
+
+    <p>If you've ever wanted to know what VCs actually say behind closed doors about your "Uber for Cats" SaaS, our **Silicon Valley VC Bro** persona is ready to tell you on our custom **Roast as a Service (RaaS)** dashboard. Let's look at the metrics VCs dissect and how we mimic them in the roaster.</p>
+
+    <h2>The VC Filter: Red Flags We Look For</h2>
+    <p>When you feed a pitch deck or business description to the VC Bro persona, it scans the text for classic startup red flags:
+      <ul>
+        <li><strong>AI Wrappers</strong>: Claiming to build proprietary AI when your product is simply an API call to OpenAI or Gemini. VCs call this "pre-revenue API wrapper arbitrage."</li>
+        <li><strong>Unclear CAC/LTV</strong>: Pitching massive CAC (Customer Acquisition Cost) targets with no realistic LTV (Lifetime Value) metrics to show user retention.</li>
+        <li><strong>Lack of Moat</strong>: If a team of two juniors in a garage can duplicate your entire product core over a weekend, you don't have a technical moat.</li>
+        <li><strong>TAM Fallacies</strong>: Claiming "If we capture just 1% of the Chinese market..." without showing realistic channel distribution or marketing budgets.</li>
+      </ul>
+    </p>
+
+    <h2>The Tech Bro Parody Persona</h2>
+    <p>Our VC Bro persona uses hilarious tech industry jargon to dismantle startup presentations:
+      <ul>
+        <li><em>"Let's double-click on that CAC projection. Is your acquisition strategy just posting on LinkedIn?"</em></li>
+        <li><em>"Love the energy, but this is a feature, not a company. Pivoting to Web3 wrapper immediately."</em></li>
+        <li><em>"Did you raise a pre-seed just to buy custom mechanical keyboards for your pre-revenue team?"</em></li>
+      </ul>
+    </p>
+
+    <div class="cta-box">
+      <h3>Ready to put your pitch deck through a brutal VC teardown?</h3>
+      <p>Enter your startup name, write your pitch summary, and let the VC Tech Bro audit your unit economics.</p>
+      <a href="/" class="cta-link">Try Roast as a Service Now</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Roastify (Roast as a Service). All rights reserved.</p>
+  </footer>
+</body>
+</html>
