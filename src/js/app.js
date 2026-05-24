@@ -1366,13 +1366,15 @@ function handleDownloadCard() {
   // Track achievements
   trackProgress('SHARED_CARD', 1);
 
+  // Check if we are in Battle Mode
+  const isBattle = activeTab === 'battle';
+  const width = 800;
+  const height = isBattle ? 650 : 550;
+
   // Create a canvas dynamically
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   
-  // Set dimensions
-  const width = 800;
-  const height = 550;
   canvas.width = width;
   canvas.height = height;
 
@@ -1381,17 +1383,20 @@ function handleDownloadCard() {
   let color1 = '#12131e';
   let color2 = '#07080c';
   let accentColor = '#e63900';
+  let secondaryColor = '#ff6a00';
   let severityLabel = 'SPICY BURNS';
 
   if (activeSeverity === 1) {
-    color1 = '#1f1a10';
-    color2 = '#0c0a06';
-    accentColor = '#f2a900';
+    color1 = '#1a1610';
+    color2 = '#090805';
+    accentColor = '#f59e0b';
+    secondaryColor = '#fbbf24';
     severityLabel = 'MILD MOCKERY';
   } else if (activeSeverity === 3) {
-    color1 = '#28103c';
-    color2 = '#0e0515';
-    accentColor = '#e033ff';
+    color1 = '#1c0828';
+    color2 = '#07010c';
+    accentColor = '#a3e635'; // Toxic Green
+    secondaryColor = '#d946ef'; // Radiant Pink
     severityLabel = 'NUCLEAR CRISIS';
   }
 
@@ -1406,7 +1411,7 @@ function handleDownloadCard() {
   ctx.strokeRect(2, 2, width - 4, height - 4);
   
   // Subtle inner grid lines
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
   ctx.lineWidth = 1;
   for (let x = 50; x < width; x += 50) {
     ctx.beginPath();
@@ -1426,7 +1431,7 @@ function handleDownloadCard() {
   ctx.font = '800 24px Outfit, sans-serif';
   ctx.fillText('ROASTIFY', 50, 60);
 
-  // Draw fire emoji or draw a symbol
+  // Draw fire emoji
   ctx.fillStyle = accentColor;
   ctx.font = '800 24px Outfit, sans-serif';
   ctx.fillText('🔥', 175, 60);
@@ -1438,45 +1443,241 @@ function handleDownloadCard() {
   roundRect(ctx, width - 200, 38, 150, 28, 4, true, true);
 
   ctx.fillStyle = accentColor;
-  ctx.font = 'bold 11px Space Grotesk, monospace';
+  ctx.font = 'bold 10px JetBrains Mono, monospace';
   ctx.textAlign = 'center';
   ctx.fillText(severityLabel, width - 125, 56);
-  ctx.textAlign = 'left'; // Reset
+  ctx.textAlign = 'left'; // Reset alignment
 
-  // Draw Target/Subject Header
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '500 16px Outfit, sans-serif';
-  ctx.fillText(`Target: ${currentSubject}`, 50, 110);
+  if (!isBattle) {
+    // ==========================================
+    // STANDARD MODE LAYOUT (DUAL COLUMN)
+    // ==========================================
 
-  // Draw Separator Line
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(50, 135);
-  ctx.lineTo(width - 50, 135);
-  ctx.stroke();
+    // Draw Target/Subject Header
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '600 14px JetBrains Mono, monospace';
+    ctx.fillText(`TARGET: ${currentSubject.toUpperCase()}`, 50, 110);
 
-  // Draw Roast Content (Wrap Text)
-  ctx.fillStyle = '#ffedd5';
-  ctx.font = 'italic 400 20px Outfit, sans-serif';
-  
-  // Wrap lines helper
-  const textX = 50;
-  let textY = 180;
-  const maxWidth = width - 100;
-  const lineHeight = 30;
-  
-  wrapText(ctx, currentRoastText, textX, textY, maxWidth, lineHeight);
+    // Draw Separator Line
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(50, 130);
+    ctx.lineTo(480, 130);
+    ctx.stroke();
+
+    // Draw Roast Content (Wrap Text)
+    ctx.fillStyle = '#ffedd5';
+    ctx.font = 'italic 400 19px Outfit, sans-serif';
+    wrapText(ctx, currentRoastText, 50, 175, 430, 28);
+
+    // Draw Right Column Glass Panel
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, 520, 100, 230, 360, 12, true, true);
+
+    const score = (currentRoastResult && currentRoastResult.score) || 80;
+    const cringe = (currentRoastResult && currentRoastResult.cringe) || 75;
+    const buzzword = (currentRoastResult && currentRoastResult.buzzword) || 70;
+    const flags = (currentRoastResult && currentRoastResult.flags) || 65;
+
+    // Draw Score Ring Gauge
+    const cx = 635;
+    const cy = 185;
+    const r = 45;
+
+    // Background track ring
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Foreground score arc
+    ctx.strokeStyle = activeSeverity === 3 ? secondaryColor : accentColor;
+    ctx.lineWidth = 7;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    const startAngle = -Math.PI / 2;
+    const endAngle = startAngle + (Math.PI * 2 * (score / 100));
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.stroke();
+
+    // Score Text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 28px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(score.toString(), cx, cy + 9);
+
+    // Score label
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = 'bold 9px JetBrains Mono, monospace';
+    ctx.fillText('SCORE', cx, cy + 22);
+
+    // Under-gauge status rating label
+    let rating = 'MILD TEASING';
+    if (score >= 90) rating = 'CRITICAL MELTDOWN';
+    else if (score >= 70) rating = 'SCORCHING HEAT';
+    else if (score >= 50) rating = 'PIPING HOT';
+
+    ctx.fillStyle = activeSeverity === 3 ? accentColor : secondaryColor;
+    ctx.font = 'bold 11px JetBrains Mono, monospace';
+    ctx.fillText(rating, cx, cy + 68);
+    ctx.textAlign = 'left'; // Reset
+
+    // Metrics progress bars
+    const drawMetricBar = (label, value, yPos, color) => {
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '600 11px Outfit, sans-serif';
+      ctx.fillText(label, 540, yPos);
+
+      ctx.fillStyle = color;
+      ctx.font = 'bold 11px Space Grotesk, monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${value}%`, 730, yPos);
+      ctx.textAlign = 'left';
+
+      // Bar track background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      roundRect(ctx, 540, yPos + 6, 190, 5, 2.5, true, false);
+
+      // Bar fill representation
+      ctx.fillStyle = color;
+      roundRect(ctx, 540, yPos + 6, Math.max(5, 190 * (value / 100)), 5, 2.5, true, false);
+    };
+
+    drawMetricBar('CRINGE FACTOR', cringe, 295, '#f59e0b');
+    drawMetricBar('BUZZWORD DENSITY', buzzword, 345, '#ea580c');
+    drawMetricBar('RED FLAGS', flags, 395, activeSeverity === 3 ? '#a3e635' : '#dc2626');
+
+  } else {
+    // ==========================================
+    // BATTLE MODE LAYOUT (DUAL PANEL COMPARISON)
+    // ==========================================
+
+    // Extract names from currentSubject
+    const nameParts = currentSubject.replace(/^battle:\s*/i, '').split(/\s+vs\s+/i);
+    const name1 = nameParts[0] ? nameParts[0].trim() : 'Contestant 1';
+    const name2 = nameParts[1] ? nameParts[1].trim() : 'Contestant 2';
+
+    const score1 = (currentRoastResult && currentRoastResult.score1) || 75;
+    const score2 = (currentRoastResult && currentRoastResult.score2) || 70;
+    const winner = (currentRoastResult && currentRoastResult.winner) || '';
+    const verdict = (currentRoastResult && currentRoastResult.verdict) || 'An epic battle of unhinged developer credentials.';
+
+    // Decide who won
+    const wUpper = winner.toLowerCase().trim();
+    const isP1Winner = wUpper === name1.toLowerCase().trim() || wUpper === 'contestant 1';
+    const isP2Winner = wUpper === name2.toLowerCase().trim() || wUpper === 'contestant 2';
+
+    // Renders side-by-side columns: left (X=50, Y=120, W=330, H=300), right (X=420, Y=120, W=330, H=300)
+    const drawDuelist = (x, y, w, h, name, score, roastText, isWinner) => {
+      // Draw background panel
+      ctx.fillStyle = isWinner ? 'rgba(255, 202, 40, 0.03)' : 'rgba(255, 255, 255, 0.02)';
+      ctx.strokeStyle = isWinner ? '#ffca28' : 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = isWinner ? 2 : 1;
+      roundRect(ctx, x, y, w, h, 12, true, true);
+
+      // Glow effect for winner panel
+      if (isWinner) {
+        ctx.shadowColor = 'rgba(255, 202, 40, 0.15)';
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle = '#ffca28';
+        ctx.strokeRect(x, y, w, h);
+        ctx.shadowBlur = 0; // Reset
+      }
+
+      // Draw Name
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 20px Outfit, sans-serif';
+      ctx.fillText(name.toUpperCase(), x + 24, y + 42);
+
+      // Draw Score label
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = 'bold 9px JetBrains Mono, monospace';
+      ctx.fillText('ROAST SCORE', x + 24, y + 66);
+
+      // Draw Score numeric
+      ctx.fillStyle = isWinner ? '#ffca28' : (activeSeverity === 3 ? accentColor : secondaryColor);
+      ctx.font = '800 36px Outfit, sans-serif';
+      ctx.fillText(score.toString(), x + 24, y + 105);
+      
+      ctx.fillStyle = '#4b5563';
+      ctx.font = '500 18px Outfit, sans-serif';
+      ctx.fillText('/100', x + 24 + ctx.measureText(score.toString()).width + 4, y + 105);
+
+      // Inner divider line
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + 24, y + 125);
+      ctx.lineTo(x + w - 24, y + 125);
+      ctx.stroke();
+
+      // Truncate individual roast text to prevent panel overflow
+      let displayRoast = roastText;
+      if (roastText.length > 200) {
+        displayRoast = roastText.substring(0, 195) + '...';
+      }
+
+      // Draw individual roast text
+      ctx.fillStyle = '#e5e7eb';
+      ctx.font = 'italic 400 13.5px Outfit, sans-serif';
+      wrapText(ctx, displayRoast, x + 24, y + 150, w - 48, 19);
+
+      // Winner Badge stamp
+      if (isWinner) {
+        ctx.fillStyle = '#ffca28';
+        ctx.font = 'bold 9px JetBrains Mono, monospace';
+        ctx.fillText('👑 WINNER', x + w - 78, y + 40);
+      }
+    };
+
+    const roast1 = currentRoastResult.roast1 || '';
+    const roast2 = currentRoastResult.roast2 || '';
+    drawDuelist(50, 120, 330, 310, name1, score1, roast1, isP1Winner);
+    drawDuelist(420, 120, 330, 310, name2, score2, roast2, isP2Winner);
+
+    // Draw VS text in the middle gap
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.font = '800 48px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('VS', 400, 260);
+    ctx.textAlign = 'left';
+
+    // Draw Verdict Section at bottom
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, 50, 450, 700, 110, 10, true, true);
+
+    // Verdict label header
+    ctx.fillStyle = activeSeverity === 3 ? accentColor : '#ffca28';
+    ctx.font = 'bold 10px JetBrains Mono, monospace';
+    ctx.fillText('🏆 DUEL VERDICT SUMMARY', 70, 478);
+
+    // Truncate verdict text if it's very long
+    let displayVerdict = verdict;
+    if (verdict.length > 200) {
+      displayVerdict = verdict.substring(0, 195) + '...';
+    }
+
+    // Verdict Text wrapped
+    ctx.fillStyle = '#ffedd5';
+    ctx.font = 'italic 400 15px Outfit, sans-serif';
+    wrapText(ctx, displayVerdict, 70, 505, 660, 21);
+  }
 
   // Draw Footer Details
   ctx.fillStyle = '#6b7280';
-  ctx.font = 'bold 13px Space Grotesk, monospace';
+  ctx.font = 'bold 12px Space Grotesk, monospace';
   const personaText = `BY ${personaSelect.options[personaSelect.selectedIndex].text.toUpperCase()}`;
-  ctx.fillText(personaText, 50, height - 50);
+  ctx.fillText(personaText, 50, height - 45);
 
   ctx.fillStyle = accentColor;
-  ctx.font = 'bold 13px Space Grotesk, monospace';
-  ctx.fillText('ROAST-AS-A-SERIVICE.VERCEL.APP', width - 295, height - 50);
+  ctx.font = 'bold 12px Space Grotesk, monospace';
+  ctx.fillText('ROAST-AS-A-SERIVICE.VERCEL.APP', width - 275, height - 45);
 
   // Trigger browser download
   const image = canvas.toDataURL("image/png");
