@@ -1,0 +1,43 @@
+# Roastify: Roast as a Service (RaaS)
+
+> Roastify is a premium, unhinged, and highly interactive AI-powered entertainment platform that generates savage, witty, and customized roasts for developers, job hunters, startup founders, and custom targets. It leverages advanced LLMs (Google Gemini) under various comedic personas like Gordon Ramsay or Silicon Valley VC Tech Bros.
+
+## Core Features
+
+- [GitHub Profile Roaster](https://roast-as-a-serivice.vercel.app/#grill-panel): Dissects repository counts, commit cadence, and language statistics to evaluate coding credentials.
+- [Resume & CV Analyzer](https://roast-as-a-serivice.vercel.app/#grill-panel): Audits job histories, flags corporate buzzwords, and highlights career red flags.
+- [Startup Pitch Teardown](https://roast-as-a-serivice.vercel.app/#grill-panel): Evaluates pitch decks, unit economics, market size, moats, and CAC targets.
+- [Spaghetti Code Blaster](https://roast-as-a-serivice.vercel.app/#grill-panel): Scans code blocks for nested loops, technical debt, and bad naming conventions.
+- [Roast Battle Mode](https://roast-as-a-serivice.vercel.app/#grill-panel): Compares two GitHub profiles or custom targets side-by-side and crowns the winner based on calculated AI metrics.
+- [Custom Target Roaster](https://roast-as-a-serivice.vercel.app/#grill-panel): Accepts custom names and contextual details to roast roommates, crypto bros, or friends.
+
+## Viral Hooks & Gamification
+
+- [Achievement Vault](https://roast-as-a-serivice.vercel.app/): Tracks browser milestones (e.g., Gladiator, Pyromaniac, Nuclear Waste) in local storage, rewarding titles with synthetic chiptune sound chimes.
+- [Hall of Shame](https://roast-as-a-serivice.vercel.app/): A localized leaderboard listing the highest-scoring roasts and historical targets.
+- [Anonymous Sharing](https://roast-as-a-serivice.vercel.app/): Generates a link allowing users to prompt friends to get roasted anonymously.
+- [Social Card Export](https://roast-as-a-serivice.vercel.app/): Draws custom-themed image cards on an HTML5 canvas for quick PNG downloads.
+
+## Tech Stack & Architecture
+
+- **Frontend**: Single Page Application using Semantic HTML5, Vanilla ES6 JavaScript (Modules), and React/React-DOM.
+- **Build Tool**: Vite.
+- **Styling**: Vanilla CSS3 featuring custom dynamic variables for Mild, Spicy, and Nuclear severity themes.
+- **API Proxy**: Vercel Node.js serverless functions acting as a proxy to run Google Gemini models safely without exposing browser-side keys.
+- **Sound Synthesis**: Web Audio API retro oscillator-based chiptune engine.
+
+## API Specification
+
+- POST `/api/roast`: Generates the roast.
+  - Headers: `Content-Type: application/json`
+  - Body Params:
+    - `type` ("github", "resume", "startup", "code", "custom", "battle")
+    - `target` (username or target name)
+    - `text` (contextual text, resume string, or code snippet)
+    - `severity` (1 = Mild, 2 = Spicy, 3 = Nuclear)
+    - `persona` ("gordon", "vc", "reviewer", "shakespeare", "genz")
+    - `language` ("english", "hinglish", "hindi", "tamil", "telugu", "kannada", "malayalam", "marathi", "bengali", "spanish", "french")
+
+## References
+
+- [Full Context Documentation](https://roast-as-a-serivice.vercel.app/llms-full.txt): Detailed specifications on achievements, prompt templates, local storage caching, and error handling behaviors.

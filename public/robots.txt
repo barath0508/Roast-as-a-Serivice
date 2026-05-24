@@ -1,4 +1,31 @@
+# Allow all standard web search crawlers
 User-agent: *
 Allow: /
+
+# Explicitly allow AI agents and LLM indexers to discover and crawl our site
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# AI Crawlers Floor Plan (llms.txt standard)
+# Link: https://roast-as-a-serivice.vercel.app/llms.txt
+# Full Link: https://roast-as-a-serivice.vercel.app/llms-full.txt
 
 Sitemap: https://roast-as-a-serivice.vercel.app/sitemap.xml
