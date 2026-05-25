@@ -895,7 +895,14 @@ async function fetchGithubProfile(username) {
   const reposUrl = `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`;
 
   updateLoadingText("Accessing GitHub credentials...");
-  const profileRes = await fetch(profileUrl);
+  let profileRes;
+  try {
+    profileRes = await fetch(profileUrl);
+  } catch (err) {
+    console.error("Network error fetching GitHub profile:", err);
+    throw new Error("GitHub API is unreachable. Please check your internet connection.");
+  }
+
   if (!profileRes.ok) {
     if (profileRes.status === 404) {
       throw new Error(`GitHub user "${username}" not found. Did they delete their account out of fear?`);
@@ -906,7 +913,14 @@ async function fetchGithubProfile(username) {
   const profileData = await profileRes.json();
   
   updateLoadingText("Cloning repository list...");
-  const reposRes = await fetch(reposUrl);
+  let reposRes;
+  try {
+    reposRes = await fetch(reposUrl);
+  } catch (err) {
+    console.error("Network error fetching GitHub repos:", err);
+    throw new Error("GitHub API is unreachable. Please check your internet connection.");
+  }
+
   let languages = [];
   let reposCount = profileData.public_repos;
 

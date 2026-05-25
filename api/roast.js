@@ -37,8 +37,6 @@ function tryParseJson(text) {
   try {
     return JSON.parse(cleanText);
   } catch (err) {
-    console.error("JSON parsing failed, attempting recovery:", err);
-    
     // Check standard roast
     if (cleanText.includes('"roast"')) {
       const roastVal = recoverStringValue(cleanText, "roast");
@@ -47,6 +45,7 @@ function tryParseJson(text) {
         const cringeMatch = cleanText.match(/"cringe"\s*:\s*(\d+)/);
         const buzzwordMatch = cleanText.match(/"buzzword"\s*:\s*(\d+)/);
         const flagsMatch = cleanText.match(/"flags"\s*:\s*(\d+)/);
+        console.warn("JSON parsing failed, but successfully recovered standard roast:", err);
         return {
           roast: roastVal,
           score: scoreMatch ? parseInt(scoreMatch[1]) : 75,
@@ -65,6 +64,7 @@ function tryParseJson(text) {
       const verdictVal = recoverStringValue(cleanText, "verdict");
       const sc1Match = cleanText.match(/"score1"\s*:\s*(\d+)/);
       const sc2Match = cleanText.match(/"score2"\s*:\s*(\d+)/);
+      console.warn("JSON parsing failed, but successfully recovered battle roast:", err);
       return {
         roast1: r1Val || '',
         roast2: r2Val || '',
@@ -79,12 +79,14 @@ function tryParseJson(text) {
     if (cleanText.includes('"comeback"')) {
       const comebackVal = recoverStringValue(cleanText, "comeback");
       if (comebackVal) {
+        console.warn("JSON parsing failed, but successfully recovered comeback:", err);
         return {
           comeback: comebackVal
         };
       }
     }
     
+    console.error("JSON parsing failed, and recovery was unsuccessful:", err);
     return null;
   }
 }
@@ -239,7 +241,11 @@ Do not write markdown blocks or text before/after the JSON.`;
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               contents: [{ role: "user", parts: [{ text: prompt }] }],
-              generationConfig: { temperature: 0.85, maxOutputTokens: 1024 }
+              generationConfig: {
+                temperature: 0.85,
+                maxOutputTokens: 1024,
+                responseMimeType: "application/json"
+              }
             })
           });
           if (!response.ok) {
@@ -392,7 +398,8 @@ The JSON must have this exact structure:
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
               temperature: 0.8,
-              maxOutputTokens: 2048
+              maxOutputTokens: 2048,
+              responseMimeType: "application/json"
             }
           })
         });

@@ -36,8 +36,6 @@ function tryParseJson(text) {
   try {
     return JSON.parse(cleanText);
   } catch (err) {
-    console.error("JSON parsing failed, attempting recovery:", err);
-    
     // Check standard roast
     if (cleanText.includes('"roast"')) {
       const roastVal = recoverStringValue(cleanText, "roast");
@@ -46,6 +44,7 @@ function tryParseJson(text) {
         const cringeMatch = cleanText.match(/"cringe"\s*:\s*(\d+)/);
         const buzzwordMatch = cleanText.match(/"buzzword"\s*:\s*(\d+)/);
         const flagsMatch = cleanText.match(/"flags"\s*:\s*(\d+)/);
+        console.warn("JSON parsing failed, but successfully recovered standard roast:", err);
         return {
           roast: roastVal,
           score: scoreMatch ? parseInt(scoreMatch[1]) : 75,
@@ -64,6 +63,7 @@ function tryParseJson(text) {
       const verdictVal = recoverStringValue(cleanText, "verdict");
       const sc1Match = cleanText.match(/"score1"\s*:\s*(\d+)/);
       const sc2Match = cleanText.match(/"score2"\s*:\s*(\d+)/);
+      console.warn("JSON parsing failed, but successfully recovered battle roast:", err);
       return {
         roast1: r1Val || '',
         roast2: r2Val || '',
@@ -78,12 +78,14 @@ function tryParseJson(text) {
     if (cleanText.includes('"comeback"')) {
       const comebackVal = recoverStringValue(cleanText, "comeback");
       if (comebackVal) {
+        console.warn("JSON parsing failed, but successfully recovered comeback:", err);
         return {
           comeback: comebackVal
         };
       }
     }
     
+    console.error("JSON parsing failed, and recovery was unsuccessful:", err);
     return null;
   }
 }
@@ -266,7 +268,8 @@ The JSON must have this exact structure:
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
               temperature: 0.8,
-              maxOutputTokens: 2048
+              maxOutputTokens: 2048,
+              responseMimeType: "application/json"
             }
           })
         });
@@ -732,13 +735,19 @@ function generateLocalHeuristicBattle(data, severity, persona) {
 // 3. Backend Proxy API Fallback Handler
 async function generateBackendAiRoast(category, data, severity, persona, language) {
   const url = "/api/roast";
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ category, data, severity, persona, language })
-  });
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ category, data, severity, persona, language })
+    });
+  } catch (err) {
+    console.error("Network error during backend API call:", err);
+    throw new Error("Unable to connect to the Roast Server. Please check your internet connection.");
+  }
 
   if (!response.ok) {
     let errorText = "";
@@ -865,7 +874,11 @@ Do not write markdown blocks or text before/after the JSON.`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
-              generationConfig: { temperature: 0.85, maxOutputTokens: 1024 }
+              generationConfig: {
+                temperature: 0.85,
+                maxOutputTokens: 1024,
+                responseMimeType: "application/json"
+              }
             })
           });
           if (!res.ok) continue;
@@ -882,11 +895,17 @@ Do not write markdown blocks or text before/after the JSON.`;
 
   } else if (aiMode) {
     // Backend proxy
-    const res = await fetch('/api/roast', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category: 'comeback', data: { roastText, subject }, severity: '2', persona, language })
-    });
+    let res;
+    try {
+      res = await fetch('/api/roast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: 'comeback', data: { roastText, subject }, severity: '2', persona, language })
+      });
+    } catch (err) {
+      console.error("Network error during comeback API call:", err);
+      throw new Error("Unable to connect to the Roast Server. Please check your internet connection.");
+    }
     if (!res.ok) {
       let errText = '';
       try { const ej = await res.json(); errText = ej.error || ej.message; } catch { errText = await res.text(); }
