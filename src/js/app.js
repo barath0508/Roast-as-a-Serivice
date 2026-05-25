@@ -2108,15 +2108,25 @@ function handleListenRoast() {
 
   // Try to match a voice to the selected language
   const langMap = {
-    english: 'en', hinglish: 'hi', hindi: 'hi',
-    tamil: 'ta', telugu: 'te', kannada: 'kn',
-    malayalam: 'ml', marathi: 'mr', bengali: 'bn',
-    spanish: 'es', french: 'fr'
+    english: 'en-US',
+    hinglish: 'hi-IN',
+    hindi: 'hi-IN',
+    tamil: 'ta-IN',
+    telugu: 'te-IN',
+    kannada: 'kn-IN',
+    malayalam: 'ml-IN',
+    marathi: 'mr-IN',
+    bengali: 'bn-IN',
+    spanish: 'es-ES',
+    french: 'fr-FR'
   };
+  const targetLang = langMap[activeLanguage] || 'en-US';
+  utterance.lang = targetLang;
+
   const voices = window.speechSynthesis.getVoices();
   if (voices.length > 0) {
-    const langCode = langMap[activeLanguage] || 'en';
-    const matched = voices.find(v => v.lang.startsWith(langCode))
+    const matched = voices.find(v => v.lang.toLowerCase() === targetLang.toLowerCase())
+                 || voices.find(v => v.lang.startsWith(targetLang.split('-')[0]))
                  || voices.find(v => v.lang.startsWith('en'));
     if (matched) utterance.voice = matched;
   }
