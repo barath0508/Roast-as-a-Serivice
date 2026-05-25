@@ -346,6 +346,10 @@ The JSON must have this exact structure:
 }`;
   }
 
+  if (category === 'startup') {
+    systemInstruction += `\n\nCRITICAL STARTUP REQUIREMENT: At the end of the "roast" text value, you MUST append a section titled "💡 ACTIONS TO FIX THIS IDEA:" listing 3 practical, actionable, yet humorous recommendations that the founders can take to make their startup viable (e.g. pivoting target audience, resolving unit economics, or establishing a defensible moat). Keep the comedic tone of the persona, but make the advice genuinely valuable.`;
+  }
+
   const languagePrompts = {
     english: 'English (Standard)',
     hinglish: 'Hinglish (Hindi + English mixed). Write the roast in natural, normal, conversational Hinglish (Hindi + English mixed) with typical colloquial slang and memes (like "yaar", "chhapri", "nibba/nibbi", "paisa barbad", "alag hi level", "kya chal raha hai", "kat gaya", etc.) that people use in real life to mock each other.',

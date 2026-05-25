@@ -220,6 +220,10 @@ The JSON must have this exact structure:
 }`;
   }
 
+  if (category === 'startup') {
+    systemInstruction += `\n\nCRITICAL STARTUP REQUIREMENT: At the end of the "roast" text value, you MUST append a section titled "💡 ACTIONS TO FIX THIS IDEA:" listing 3 practical, actionable, yet humorous recommendations that the founders can take to make their startup viable (e.g. pivoting target audience, resolving unit economics, or establishing a defensible moat). Keep the comedic tone of the persona, but make the advice genuinely valuable.`;
+  }
+
   const languagePrompts = {
     english: 'English (Standard)',
     hinglish: 'Hinglish (Hindi + English mixed). Write the roast in natural, normal, conversational Hinglish (Hindi + English mixed) with typical colloquial slang and memes (like "yaar", "chhapri", "nibba/nibbi", "paisa barbad", "alag hi level", "kya chal raha hai", "kat gaya", etc.) that people use in real life to mock each other.',
@@ -334,13 +338,13 @@ const LOCAL_ROAST_TEMPLATES = {
     },
     startup: {
       "1": [
-        "'{startupName}'? Well, it's a concept. But the pitch: '{startupDesc}' is a bit half-baked. It needs structure, it needs a real recipe. You can't just throw ingredients in a pot and call it a soup."
+        "'{startupName}'? Well, it's a concept. But the pitch: '{startupDesc}' is a bit half-baked. It needs structure, it needs a real recipe. You can't just throw ingredients in a pot and call it a soup.\n\n💡 ACTIONS TO FIX THIS IDEA:\n1. Get a solid recipe (business plan) before opening the kitchen.\n2. Source fresh ingredients (market research) instead of guessing."
       ],
       "2": [
-        "Are you serious? You want to pitch '{startupName}'? It's completely tasteless! '{startupDesc}' - this is a recipe for a financial kitchen nightmare! You're trying to sell water to a drowning man. Sort out your margins before you get kicked out of the market!"
+        "Are you serious? You want to pitch '{startupName}'? It's completely tasteless! '{startupDesc}' - this is a recipe for a financial kitchen nightmare! You're trying to sell water to a drowning man. Sort out your margins before you get kicked out of the market!\n\n💡 ACTIONS TO FIX THIS IDEA:\n1. Stop over-pricing your weak dishes (fix your pricing tier).\n2. Hire a proper manager to control your food costs (margins).\n3. Pivot the menu to what the locals actually want."
       ],
       "3": [
-        "LISTEN TO ME! '{startupName}' is the most ridiculous, uninspired, catastrophic idea I have ever heard in my entire life! '{startupDesc}'? You call that a pitch? It's a joke! It's so raw, a VC would get salmonella just looking at it! \n\nYou're incinerating cash faster than a wood-fire pizza oven! You have no customers, no model, and absolutely no clue! Shut it down before you go completely bankrupt!"
+        "LISTEN TO ME! '{startupName}' is the most ridiculous, uninspired, catastrophic idea I have ever heard in my entire life! '{startupDesc}'? You call that a pitch? It's a joke! It's so raw, a VC would get salmonella just looking at it! \n\nYou're incinerating cash faster than a wood-fire pizza oven! You have no customers, no model, and absolutely no clue! Shut it down before you go completely bankrupt!\n\n💡 ACTIONS TO FIX THIS IDEA:\n1. Burn the menu and start from scratch with a single viable dish.\n2. Fire your marketing team that's writing fictional pitch descriptions.\n3. Actually work in a kitchen (get industry experience) before trying to run a restaurant."
       ]
     },
     code: {
@@ -391,13 +395,13 @@ const LOCAL_ROAST_TEMPLATES = {
     },
     startup: {
       "1": [
-        "I like the space '{startupName}' is in. However, '{startupDesc}' doesn't clearly define your moat. What's the proprietary distribution channel?"
+        "I like the space '{startupName}' is in. However, '{startupDesc}' doesn't clearly define your moat. What's the proprietary distribution channel?\n\n💡 ACTIONS TO FIX THIS IDEA:\n1. Define your distribution channel clearly before pitching.\n2. Identify a single core feature that makes you stand out from incumbents."
       ],
       "2": [
-        "The problem statement for '{startupName}' is weak. '{startupDesc}' reads like a solution looking for a problem. Your CAC (customer acquisition cost) is going to be astronomical. Have you thought about a B2B pivot?"
+        "The problem statement for '{startupName}' is weak. '{startupDesc}' reads like a solution looking for a problem. Your CAC (customer acquisition cost) is going to be astronomical. Have you thought about a B2B pivot?\n\n💡 ACTIONS TO FIX THIS IDEA:\n1. Pivot to a B2B SaaS model to support higher pricing and LTV.\n2. Talk to 10 potential customers to validate if this problem actually exists.\n3. Focus on a narrow, high-value niche rather than trying to serve everyone."
       ],
       "3": [
-        "Let's talk unit economics: they are absolutely toxic. '{startupName}' has zero moat, zero network effects, and a target addressable market of about 15 people. \n\nYour pitch '{startupDesc}' is a collection of buzzwords wrapped in a fever dream. You're burning cash on Google Ads just to get bots to click your landing page. This is a lifestyle project masquerading as a unicorn. I'm passing on this, and so is everyone else on Sand Hill Road."
+        "Let's talk unit economics: they are absolutely toxic. '{startupName}' has zero moat, zero network effects, and a target addressable market of about 15 people. \n\nYour pitch '{startupDesc}' is a collection of buzzwords wrapped in a fever dream. You're burning cash on Google Ads just to get bots to click your landing page. This is a lifestyle project masquerading as a unicorn. I'm passing on this, and so is everyone else on Sand Hill Road.\n\n💡 ACTIONS TO FIX THIS IDEA:\n1. Re-evaluate your cost structures and price points to fix your margins.\n2. Build a simple landing page to collect email signups before writing any code.\n3. Stop buying fake ad clicks and seek organic user interviews."
       ]
     },
     code: {
