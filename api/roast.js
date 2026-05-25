@@ -115,13 +115,19 @@ function recoverBattleRoast(text, target1, target2) {
     r2 = parts.slice(1).join("\n\n");
   }
 
+  // Randomize fallback winner so it's not always one-sided
+  const isTarget1Winner = Math.random() > 0.5;
+  const winner = isTarget1Winner ? target1 : target2;
+  const score1 = isTarget1Winner ? 85 : 72;
+  const score2 = isTarget1Winner ? 72 : 85;
+
   return {
     roast1: r1,
     roast2: r2,
-    winner: target1,
-    verdict: "The battle collapsed into pure chaos. A default victory is awarded to the initiator.",
-    score1: 80,
-    score2: 70
+    winner: winner,
+    verdict: `The battle collapsed into pure chaos, but a victory is awarded to ${winner}.`,
+    score1: score1,
+    score2: score2
   };
 }
 

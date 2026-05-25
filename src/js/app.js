@@ -122,7 +122,8 @@ const battlePlayer1Bar = document.getElementById('battle-player1-bar');
 const battlePlayer2Name = document.getElementById('battle-player2-name');
 const battlePlayer2Score = document.getElementById('battle-player2-score');
 const battlePlayer2Bar = document.getElementById('battle-player2-bar');
-const battleWinnerBadge = document.getElementById('battle-winner-badge');
+const battlePlayer1Crown = document.getElementById('battle-player1-crown');
+const battlePlayer2Crown = document.getElementById('battle-player2-crown');
 
 // Anonymous Banner
 const anonBanner = document.getElementById('anon-banner');
@@ -1895,10 +1896,9 @@ function showBattleScore(score1, score2, name1, name2, winnerName) {
     }
   }, 10);
   
-  // Winner crown badge show
-  if (battleWinnerBadge) {
-    battleWinnerBadge.classList.remove('hidden');
-  }
+  // Hide crown badges initially
+  if (battlePlayer1Crown) battlePlayer1Crown.classList.add('hidden');
+  if (battlePlayer2Crown) battlePlayer2Crown.classList.add('hidden');
   
   // Highlight winner player panel
   const p1Panel = document.querySelector('.battle-score-player.player1');
@@ -1910,12 +1910,22 @@ function showBattleScore(score1, score2, name1, name2, winnerName) {
     p2Panel.style.boxShadow = '';
     
     setTimeout(() => {
-      if (winnerName && winnerName.toLowerCase().trim() === name1.toLowerCase().trim()) {
+      const cleanWinner = (winnerName || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+      const cleanName1 = name1.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+      const cleanName2 = name2.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+
+      // Check if winner name matches name1 or score1 is greater (in case name matching has anomalies)
+      const isPlayer1Winner = cleanWinner === cleanName1 || (cleanWinner !== cleanName2 && score1 > score2);
+      const isPlayer2Winner = cleanWinner === cleanName2 || (cleanWinner !== cleanName1 && score2 > score1);
+
+      if (isPlayer1Winner) {
         p1Panel.style.border = '1px solid #ffca28';
         p1Panel.style.boxShadow = '0 0 15px rgba(255, 202, 40, 0.15)';
-      } else if (winnerName && winnerName.toLowerCase().trim() === name2.toLowerCase().trim()) {
+        if (battlePlayer1Crown) battlePlayer1Crown.classList.remove('hidden');
+      } else if (isPlayer2Winner) {
         p2Panel.style.border = '1px solid #ffca28';
         p2Panel.style.boxShadow = '0 0 15px rgba(255, 202, 40, 0.15)';
+        if (battlePlayer2Crown) battlePlayer2Crown.classList.remove('hidden');
       }
     }, 1000);
   }

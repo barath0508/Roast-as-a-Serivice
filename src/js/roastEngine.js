@@ -113,13 +113,19 @@ function recoverBattleRoast(text, target1, target2) {
     r2 = parts.slice(1).join("\n\n");
   }
 
+  // Randomize fallback winner so it's not always one-sided
+  const isTarget1Winner = Math.random() > 0.5;
+  const winner = isTarget1Winner ? target1 : target2;
+  const score1 = isTarget1Winner ? 85 : 72;
+  const score2 = isTarget1Winner ? 72 : 85;
+
   return {
     roast1: r1,
     roast2: r2,
-    winner: target1,
-    verdict: "The battle collapsed into pure chaos. A default victory is awarded to the initiator.",
-    score1: 80,
-    score2: 70
+    winner: winner,
+    verdict: `The battle collapsed into pure chaos, but a victory is awarded to ${winner}.`,
+    score1: score1,
+    score2: score2
   };
 }
 
@@ -699,8 +705,15 @@ function generateLocalHeuristicBattle(data, severity, persona) {
 
   const pTemplates = battleRoasts[persona] || battleRoasts['gordon'];
 
-  const score1 = (hash1 % 30) + 60;
-  const score2 = (hash2 % 30) + 60;
+  let score1 = (hash1 % 25) + 60;
+  let score2 = (hash2 % 25) + 60;
+
+  // Ensure the designated winner always has a higher score
+  if (winner === t1 && score1 <= score2) {
+    score1 = score2 + Math.floor(Math.random() * 8) + 4;
+  } else if (winner === t2 && score2 <= score1) {
+    score2 = score1 + Math.floor(Math.random() * 8) + 4;
+  }
 
   return {
     roast1: pTemplates.roast1,
