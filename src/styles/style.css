@@ -79,15 +79,15 @@ body {
 
 /* Background floating animation */
 @keyframes float-slow {
-  0% { transform: translateY(0px) scale(1); }
-  50% { transform: translateY(-30px) scale(1.1); }
-  100% { transform: translateY(0px) scale(1); }
+  0% { transform: translate3d(0, 0px, 0) scale(1); }
+  50% { transform: translate3d(0, -30px, 0) scale(1.1); }
+  100% { transform: translate3d(0, 0px, 0) scale(1); }
 }
 
 @keyframes float-reverse {
-  0% { transform: translateY(0px) scale(1.1); }
-  50% { transform: translateY(30px) scale(0.9); }
-  100% { transform: translateY(0px) scale(1.1); }
+  0% { transform: translate3d(0, 0px, 0) scale(1.1); }
+  50% { transform: translate3d(0, 30px, 0) scale(0.9); }
+  100% { transform: translate3d(0, 0px, 0) scale(1.1); }
 }
 
 .bg-orb {
@@ -96,6 +96,8 @@ body {
   filter: blur(120px);
   z-index: -1;
   pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 .orb-1 {
@@ -158,6 +160,8 @@ h1, h2, h3, h4 {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-main);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transform: translate3d(0, 0, 0);
+  will-change: transform, border-color, box-shadow;
 }
 
 .glass-panel:hover {
@@ -224,24 +228,27 @@ h1, h2, h3, h4 {
   fill: var(--flame-outer);
   transform-origin: 50% 100px;
   animation: flicker 1.8s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .flame-middle {
   fill: var(--flame-middle);
   transform-origin: 50% 100px;
   animation: flicker 1.2s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .flame-inner {
   fill: var(--flame-inner);
   transform-origin: 50% 100px;
   animation: flicker 0.8s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 @keyframes flicker {
-  0% { transform: scale(1) rotate(-1deg); filter: brightness(0.9); }
-  50% { transform: scale(1.05) rotate(1.5deg); filter: brightness(1.1); }
-  100% { transform: scale(0.96) rotate(-2deg); filter: brightness(1); }
+  0% { transform: translate3d(0, 0, 0) scale(1) rotate(-1deg); }
+  50% { transform: translate3d(0, 0, 0) scale(1.05) rotate(1.5deg); }
+  100% { transform: translate3d(0, 0, 0) scale(0.96) rotate(-2deg); }
 }
 
 .header-actions {
@@ -3141,83 +3148,7 @@ textarea.code-font {
   border: 1px solid var(--card-border);
 }
 
-/* ================================================================
-   Advertisement Styling & Layout
-   ================================================================ */
-.ad-banner-container {
-  max-width: 1400px;
-  margin: 1.5rem auto 0;
-  padding: 0 1rem;
-}
 
-.ad-banner-inner {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  position: relative;
-  min-height: 90px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  box-shadow: var(--shadow-main);
-  backdrop-filter: blur(8px);
-  transition: border-color var(--transition-fast);
-}
-
-.ad-banner-inner:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.ad-label {
-  position: absolute;
-  top: 6px;
-  left: 10px;
-  font-family: var(--font-main);
-  font-size: 0.6rem;
-  font-weight: 800;
-  color: var(--text-muted);
-  letter-spacing: 1.5px;
-}
-
-.ad-placeholder-slot {
-  font-family: var(--font-main);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ad-placeholder-slot i {
-  font-size: 1rem;
-  color: hsl(var(--accent));
-  opacity: 0.8;
-}
-
-/* Sidebar Drawer Ad Slot */
-.drawer-ad-slot {
-  margin: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed var(--card-border);
-  border-radius: var(--radius-sm);
-  padding: 15px;
-  text-align: center;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: center;
-}
-
-.drawer-ad-slot i {
-  font-size: 1.1rem;
-  color: hsl(var(--accent));
-}
 
 /* Custom SEO Hero & Features Styles */
 .hero-seo-section {
