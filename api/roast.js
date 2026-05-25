@@ -205,9 +205,10 @@ ${roastText}
 Now, the subject is CLAPPING BACK. Generate a savage, witty, hilarious COMEBACK / DEFENSE on behalf of the subject. The comeback should:
 1. Directly address specific points from the original roast
 2. Turn the roaster's words against them
-3. Be equally or MORE savage than the original roast
-4. Include clever wordplay and mic-drop moments
+3. Be equally or MORE savage than the original roast in a highly comedic way
+4. Include clever wordplay, funny metaphors, and mic-drop comedy moments
 5. End with a devastating final line
+6. Maintain an energetic and entertaining tone. Do NOT use toxic words, profanity, or genuinely malicious attacks.
 
 Write the comeback in this language/style: ${selectedLangPrompt}
 
@@ -304,7 +305,7 @@ Do not write markdown blocks or text before/after the JSON.`;
     'vc': 'Silicon Valley VC: Tech-bro buzzword-heavy, condescendingly talks about scaling, synergizing, unit economics, seed-rounds, AI-pivot, and burning cash. Passive-aggressive.',
     'reviewer': 'Condescending Code Reviewer: Pedantic, passive-aggressive, nitpicky, sighs, asks "did you even run this?", refers to code smells, bad Git practices, and stackoverflow copy-pasting.',
     'shakespeare': 'Shakespearean Insulter: Poetical, dramatic, theatrical Elizabethan language, uses words like "Thou", "Knave", "Beast", "Lily-livered", "Cockatrice", rhyming insults.',
-    'genz': 'Sarcastic Gen Z: Minimalist lowercase, heavy skull emoji use (💀), "bruh", "it\'s giving...", "no cap", "who let you cook", "caught in 4k", "side eye", zero punctuation, bored and unimpressed.'
+    'genz': 'Sarcastic Gen Z: Minimalist lowercase, heavy skull emoji use (💀), "bruh", "it\'s giving...", "no cap", "who let you cook", "caught in 4k", "side eye", zero punctuation, delivering unhinged comedic commentary.'
   };
 
   let systemInstruction = '';
@@ -357,6 +358,10 @@ The JSON must have this exact structure:
   const selectedLanguagePrompt = languagePrompts[selectedLanguage] || languagePrompts['english'];
   
   systemInstruction += `\n\nCRITICAL: You MUST write the roast string values (and the verdict/summarizing text) in the following language/slang style: ${selectedLanguagePrompt}. Keep all JSON key names in standard English as specified in the schema, but generate the text content values using this language/slang. Make it sound like natural, normal, conversational mocking that real people would use, keeping the tone of the persona and severity.`;
+  systemInstruction += `\n\nTONE & COMEDY RULES:
+1. Keep the tone energetic, engaging, and highly comedic. Avoid sounding bored, lazy, or dismissive.
+2. Do NOT use toxic, vulgar, or genuinely abusive/hateful language. No profanity or highly mean-spirited personal attacks.
+3. Focus on witty developer jokes, hilarious analogies, and playful parodies. The goal is clever stand-up comedy that makes the user laugh, not feel genuinely insulted. Keep the burns creative and self-aware.`;
   systemInstruction += `\n\nSAFETY GUIDELINE: Do NOT generate hate speech, slurs, doxxing, threats, or genuinely malicious/harmful content. If the input contains highly offensive, illegal, or abusive material, reject it gracefully and humorously.`;
 
   const prompt = `${systemInstruction}\n\nSubject to roast:\n${subjectDesc}`;
