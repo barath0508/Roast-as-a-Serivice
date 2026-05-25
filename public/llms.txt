@@ -5,6 +5,7 @@
 ## Core Features
 
 - [GitHub Profile Roaster](https://roastify-app.vercel.app/#grill-panel): Dissects repository counts, commit cadence, and language statistics to evaluate coding credentials.
+- [LeetCode Profile Roaster](https://roastify-app.vercel.app/#grill-panel): Fetches solved questions difficulty breakdown, acceptance rates, and rankings for algorithmic critiques.
 - [Resume & CV Analyzer](https://roastify-app.vercel.app/#grill-panel): Audits job histories, flags corporate buzzwords, and highlights career red flags.
 - [Startup Pitch Teardown](https://roastify-app.vercel.app/#grill-panel): Evaluates pitch decks, unit economics, market size, moats, and CAC targets.
 - [Spaghetti Code Blaster](https://roastify-app.vercel.app/#grill-panel): Scans code blocks for nested loops, technical debt, and bad naming conventions.
@@ -31,7 +32,7 @@
 - POST `/api/roast`: Generates the roast.
   - Headers: `Content-Type: application/json`
   - Body Params:
-    - `type` ("github", "resume", "startup", "code", "custom", "battle")
+    - `type` ("github", "leetcode", "resume", "startup", "code", "custom", "battle")
     - `target` (username or target name)
     - `text` (contextual text, resume string, or code snippet)
     - `severity` (1 = Mild, 2 = Spicy, 3 = Nuclear)

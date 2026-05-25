@@ -273,6 +273,9 @@
           <button class="tab-btn active" data-tab="github" id="tab-github-btn">
             <i class="fab fa-github"></i> <span>GitHub</span>
           </button>
+          <button class="tab-btn" data-tab="leetcode" id="tab-leetcode-btn">
+            <i class="fas fa-laptop-code"></i> <span>LeetCode</span>
+          </button>
           <button class="tab-btn" data-tab="resume" id="tab-resume-btn">
             <i class="fas fa-file-invoice"></i> <span>Resume</span>
           </button>
@@ -300,6 +303,15 @@
               <input type="text" id="github-username" placeholder="e.g. torvalds" autocomplete="off" required>
             </div>
             <p class="input-desc">We'll fetch their real repos, commits, and language stats for a highly personalized burn.</p>
+          </div>
+
+          <div class="tab-content" id="tab-leetcode">
+            <label for="leetcode-username" class="input-label">LeetCode Username</label>
+            <div class="input-group">
+              <span class="input-prefix">leetcode.com/</span>
+              <input type="text" id="leetcode-username" placeholder="e.g. leetcode_user" autocomplete="off">
+            </div>
+            <p class="input-desc">We'll fetch solved counts, difficulty distribution, and global ranking to evaluate their algorithmic power.</p>
           </div>
 
           <div class="tab-content" id="tab-resume">

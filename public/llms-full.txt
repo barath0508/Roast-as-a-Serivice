@@ -76,6 +76,7 @@ Roastify runs on a strict **zero-database, client-side persistence** policy:
 
 If the Google Gemini backend is unavailable, rate-limited, or blocked by content safety filters, the application's client engine (`src/js/roastEngine.js`) falls back to pre-baked comedic heuristics matching the parameters:
 *   **GitHub**: Insults the target's commit graph, green square density, and language choices.
+*   **LeetCode**: Grills the solved questions difficulty distribution, global ranking, and acceptance rate.
 *   **Resume**: Roasts standard corporate terms ("highly motivated self-starter", "team player").
 *   **Code**: Mocks standard code structures (empty catches, deep nested conditions, endless script imports).
 *   **Startup**: Blasts common SAAS ideas ("AI wrapper for PDF", "SaaS for laundry").

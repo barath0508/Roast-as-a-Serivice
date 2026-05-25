@@ -165,6 +165,8 @@ async function generateAiRoast(apiKey, category, data, severity, persona, langua
   } else {
     if (category === 'github') {
       subjectDesc = `GitHub Profile for user "${data.username}". Details: Name: ${data.name}, Bio: ${data.bio}, Repos: ${data.reposCount}, Followers: ${data.followers}, Top Languages: ${JSON.stringify(data.languages)}`;
+    } else if (category === 'leetcode') {
+      subjectDesc = `LeetCode Profile for user "${data.username}". Stats: Solved: ${data.totalSolved} (Easy: ${data.easySolved}, Medium: ${data.mediumSolved}, Hard: ${data.hardSolved}), Acceptance Rate: ${data.acceptanceRate}%, Global Ranking: ${data.ranking}`;
     } else if (category === 'resume') {
       subjectDesc = `Resume text: ${data.resumeText}`;
     } else if (category === 'startup') {
@@ -328,6 +330,19 @@ const LOCAL_ROAST_TEMPLATES = {
         "STUFFING HELL! This isn't a GitHub profile, it's a digital landfill! {reposCount} repos and every single one is a absolute shambles! Look at the language: {topLang}. You've completely ruined it! It's RAW! It's so raw it's still running on localhost! \n\nYou have {followers} followers and you're following {following} people? You're basically begging for stars, aren't you? Shut it down, clean your directory, and get out of the kitchen!"
       ]
     },
+    leetcode: {
+      "1": [
+        "So you solved {totalSolved} questions, {username}? And most of them are Easy? You're playing it safer than a microwave chef! Put some dynamic programming spice on it!",
+        "Alright, {totalSolved} questions solved. Not bad. But your ranking is {ranking}. Come on, my grandma can traverse a binary search tree faster than that!"
+      ],
+      "2": [
+        "What in the world is this? {easySolved} Easy solved but only {hardSolved} Hard? You're terrified of the hard problems, aren't you? It's bland! It has no algorithmic flavor! Clean up your complexity!",
+        "Look at this profile. Your acceptance rate is {acceptanceRate}%? You're just clicking submit and letting the compiler do your thinking! Learn to write proper logic first!"
+      ],
+      "3": [
+        "OH MY GOD! {easySolved} Easy solved, {mediumSolved} Medium, and {hardSolved} Hard? This isn't problem solving, it's dynamic programming daycare! You've memorized 2Sum and called yourself a software engineer! Thy global ranking is {ranking}! I've seen better recursion in a broken mirror. Shut down the IDE and get out of the kitchen!"
+      ]
+    },
     resume: {
       "1": [
         "This resume is a bit light, isn't it? You've listed all these 'skills' but it reads like a grocery list. You need to show some passion, some seasoning! Don't just sit there listing tools, tell us what you actually cooked!"
@@ -383,6 +398,17 @@ const LOCAL_ROAST_TEMPLATES = {
       ],
       "3": [
         "Let's be transparent here. Your GitHub profile is a lifestyle business. {reposCount} repos of unmaintained code. You're coding in {topLang}? That is a commodity stack. Where is the web3 layer? Where is the LLM agent integration? \n\nYou have 0 stars on most of your repos. That's a total lack of product-market fit. I suggest you acqui-hire yourself into a real job because this portfolio has negative enterprise value."
+      ]
+    },
+    leetcode: {
+      "1": [
+        "Interesting profile, {username}. Solved {totalSolved} problems. But does this translate to developer velocity? We need high-leverage products, not array permutations."
+      ],
+      "2": [
+        "You've solved {mediumSolved} Mediums but only {hardSolved} Hards? That's a low-yield portfolio. Your acceptance rate is {acceptanceRate}%? We need to optimize your compiler unit economics to scale."
+      ],
+      "3": [
+        "Let's be transparent: your LeetCode profile has negative enterprise value. Grinding {totalSolved} questions to rank {ranking}? You're burning cash on dynamic programming while we're building wrappers. Pivot to AI or you're pre-revenue forever."
       ]
     },
     resume: {
@@ -442,6 +468,17 @@ const LOCAL_ROAST_TEMPLATES = {
         "REJECTED. I don't even know where to start. {reposCount} repositories of pure spaghetti. Your commit history looks like a crime scene—mostly on weekends, probably under the influence of energy drinks. \n\nYou code in {topLang} but you don't use a linter. Your bio is '{bio}', which is highly optimistic given your total lack of design patterns. Please delete your account, read 'Clean Code', and never open a PR in my team again."
       ]
     },
+    leetcode: {
+      "1": [
+        "Solved {totalSolved} questions. Please write unit tests and optimize space complexity. LGTM with nits."
+      ],
+      "2": [
+        "Your acceptance rate is {acceptanceRate}%? It suggests you're spamming the submit button until it passes. Please run your tests locally first."
+      ],
+      "3": [
+        "CRITICAL REJECTION. Solved {easySolved} Easy problems but your Hard count is {hardSolved}? You're copy-pasting solutions from the discussions board. Your O(N^2) complexity is a system threat. Rejecting and closing this profile."
+      ]
+    },
     resume: {
       "1": [
         "Formatting nits: font size is inconsistent, and please change 'proficient in' to 'familiar with' for most of these skills."
@@ -499,6 +536,17 @@ const LOCAL_ROAST_TEMPLATES = {
         "Thou lily-livered, clay-brained coder! Thy GitHub scrolls are a plague upon the kingdom! {reposCount} repositories of pure mud and folly! Thou writes in {topLang}? A tongue fit only for swine! \n\nThy bio '{bio}' is a tragic comedy. {followers} followers? Not even the stray dogs of GitHub would walk in thy shadow! Return to thy chamber and weep upon thy keyboard!"
       ]
     },
+    leetcode: {
+      "1": [
+        "Thy solved scrolls number at {totalSolved}, {username}. A fair start, yet thou must seek deeper challenges to win the praise of thy peers."
+      ],
+      "2": [
+        "Fie upon thy {acceptanceRate}% acceptance! Thou art but a fool guessing at array indexes like a blind builder. Study the ancient scripts!"
+      ],
+      "3": [
+        "Thou lily-livered problem-solver! Grinding day and night to rank at {ranking}! Thy solutions are full of sound and fury, yielding nothing but memory leaks! Return to thy chamber and weep!"
+      ]
+    },
     resume: {
       "1": [
         "Thy chronicle of deeds is fair, yet thy words are soft. Be more bold in thy proclamations, gentle scribe."
@@ -554,6 +602,17 @@ const LOCAL_ROAST_TEMPLATES = {
       ],
       "3": [
         "bruh who let {name} cook on github 💀 {reposCount} repos of absolute nothing. coding in {topLang}? it's giving 2012 tutorial vibes. \n\nyour bio says '{bio}'... yeah ok sure. {followers} followers? literally caught in 4k being irrelevant. side eye. massive side eye. 💀"
+      ]
+    },
+    leetcode: {
+      "1": [
+        "ok {username} i guess solved {totalSolved} is cute. NPC coding grindset though. but go off i guess"
+      ],
+      "2": [
+        "not you solving {easySolved} easy but only {hardSolved} hard 💀 bro is literally running away from the mediums. pick a struggle."
+      ],
+      "3": [
+        "bruh who let you cook on leetcode 💀 solved {totalSolved} questions and ranking {ranking} is giving major tutorial hell. acceptance rate is {acceptanceRate}%? caught in 4k being mid. side eye. 💀"
       ]
     },
     resume: {
@@ -635,6 +694,19 @@ function generateLocalHeuristicRoast(category, data, severity, persona) {
       .replace(/{following}/g, data.following ?? 0)
       .replace(/{bio}/g, bio)
       .replace(/{topLang}/g, data.languages && data.languages.length > 0 ? data.languages[0] : 'HTML');
+  } else if (category === 'leetcode') {
+    const solved = data.totalSolved ?? 0;
+    const ranking = data.ranking ?? 999999;
+    nameSeed = (data.username || '').length + solved;
+    
+    text = text
+      .replace(/{username}/g, data.username || 'leetcode_user')
+      .replace(/{totalSolved}/g, solved)
+      .replace(/{easySolved}/g, data.easySolved ?? 0)
+      .replace(/{mediumSolved}/g, data.mediumSolved ?? 0)
+      .replace(/{hardSolved}/g, data.hardSolved ?? 0)
+      .replace(/{acceptanceRate}/g, data.acceptanceRate ?? 50.0)
+      .replace(/{ranking}/g, ranking);
   } else if (category === 'resume') {
     nameSeed = (data.resumeText || '').length;
     text = text.replace(/{resumeText}/g, data.resumeText || 'empty paper');

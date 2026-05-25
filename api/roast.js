@@ -295,6 +295,8 @@ Do not write markdown blocks or text before/after the JSON.`;
   } else {
     if (category === 'github') {
       subjectDesc = `GitHub Profile for user "${data.username}". Details: Name: ${data.name}, Bio: ${data.bio}, Repos: ${data.reposCount}, Followers: ${data.followers}, Top Languages: ${JSON.stringify(data.languages)}`;
+    } else if (category === 'leetcode') {
+      subjectDesc = `LeetCode Profile for user "${data.username}". Stats: Solved: ${data.totalSolved} (Easy: ${data.easySolved}, Medium: ${data.mediumSolved}, Hard: ${data.hardSolved}), Acceptance Rate: ${data.acceptanceRate}%, Global Ranking: ${data.ranking}`;
     } else if (category === 'resume') {
       subjectDesc = `Resume text: ${data.resumeText}`;
     } else if (category === 'startup') {

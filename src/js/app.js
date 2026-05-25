@@ -948,6 +948,59 @@ async function fetchGithubProfile(username) {
   };
 }
 
+// LeetCode API Fetcher
+async function fetchLeetcodeProfile(username) {
+  updateLoadingText("Accessing LeetCode profile...");
+  let data = null;
+  
+  // 1. Try our serverless CORS proxy first
+  try {
+    const res = await fetch(`/api/leetcode?username=${username}`);
+    if (res.ok) {
+      data = await res.json();
+    } else {
+      console.warn(`Local serverless proxy returned status ${res.status}, falling back to direct browser fetch...`);
+    }
+  } catch (err) {
+    console.warn("Local serverless proxy request failed, falling back to direct browser fetch...", err);
+  }
+  
+  // 2. Try direct browser fetch to Render proxy (which has CORS enabled) if backend proxy failed
+  if (!data) {
+    updateLoadingText("Accessing LeetCode backup registry...");
+    try {
+      const res = await fetch(`https://alfa-leetcode-api.onrender.com/${username}/solved`);
+      if (res.ok) {
+        const json = await res.json();
+        data = {
+          totalSolved: json.solvedProblem || 0,
+          easySolved: json.easySolved || 0,
+          mediumSolved: json.mediumSolved || 0,
+          hardSolved: json.hardSolved || 0,
+          acceptanceRate: 50.0,
+          ranking: 999999
+        };
+      }
+    } catch (err) {
+      console.error("Direct browser LeetCode API failed:", err);
+    }
+  }
+
+  if (!data) {
+    throw new Error(`Failed to fetch LeetCode profile for "${username}". The user might not exist, or the LeetCode stats servers are currently offline.`);
+  }
+
+  return {
+    username: username,
+    totalSolved: data.totalSolved,
+    easySolved: data.easySolved,
+    mediumSolved: data.mediumSolved,
+    hardSolved: data.hardSolved,
+    acceptanceRate: data.acceptanceRate || 50.0,
+    ranking: data.ranking || 999999
+  };
+}
+
 // Update loading text during generation
 function updateLoadingText(text) {
   loadingPhaseText.textContent = text;
@@ -1100,6 +1153,10 @@ async function handleIgniteSubmit(e) {
       const username = document.getElementById('github-username').value.trim();
       currentSubject = `github/${username}`;
       payloadData = await fetchGithubProfile(username);
+    } else if (activeTab === 'leetcode') {
+      const username = document.getElementById('leetcode-username').value.trim();
+      currentSubject = `leetcode/${username}`;
+      payloadData = await fetchLeetcodeProfile(username);
     } else if (activeTab === 'resume') {
       const text = document.getElementById('resume-text').value.trim();
       currentSubject = `resume/profile`;
@@ -2177,7 +2234,7 @@ async function handleRouletteClick() {
   rouletteOverlay.classList.remove('hidden');
   rouletteResult.classList.add('hidden');
 
-  const categories = ['github', 'resume', 'startup', 'code', 'custom'];
+  const categories = ['github', 'leetcode', 'resume', 'startup', 'code', 'custom'];
   const personas = ['gordon', 'vc', 'reviewer', 'shakespeare', 'genz'];
   const severities = [1, 2, 3];
 
@@ -2245,6 +2302,10 @@ function fillRoulettePlaceholder(category) {
     github: () => {
       const usernames = ['torvalds', 'gaearon', 'tj', 'sindresorhus', 'yyx990803'];
       document.getElementById('github-username').value = usernames[Math.floor(Math.random() * usernames.length)];
+    },
+    leetcode: () => {
+      const usernames = ['tourist', 'Benq', 'kamyu', 'neal_wu', 'alexwice'];
+      document.getElementById('leetcode-username').value = usernames[Math.floor(Math.random() * usernames.length)];
     },
     resume: () => {
       const resumes = [
