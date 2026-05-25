@@ -55,6 +55,7 @@ body.theme-nuclear {
 html {
   scrollbar-gutter: stable;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 * {
