@@ -2,6 +2,29 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/(draft-page.html|duplicate-blog.html|admin/.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/old-page-name.html",
+      "destination": "/new-canonical-page.html",
+      "permanent": true
+    },
+    {
+      "source": "/another-old-url",
+      "destination": "/canonical-destination",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",

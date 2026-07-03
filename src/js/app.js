@@ -663,9 +663,25 @@ function init() {
     });
   }
 
-  const hideDisclaimer = localStorage.getItem('roastify_hide_disclaimer') === 'true';
-  if (!hideDisclaimer) {
-    openInfoModal('disclaimer');
+  // Intrusive Interstitial Guard (First-visit bypass for Googlebot & new users)
+  const VISIT_KEY = 'roastify_visited';
+  let visited;
+  try {
+    visited = localStorage.getItem(VISIT_KEY);
+  } catch (_) {}
+
+  if (!visited) {
+    // If they have never visited, log the visit, automatically bypass the disclaimer, and exit.
+    // This prevents showing full-screen overlays/modals to new traffic from Google Search / Googlebot.
+    try {
+      localStorage.setItem(VISIT_KEY, '1');
+      localStorage.setItem('roastify_hide_disclaimer', 'true');
+    } catch (_) {}
+  } else {
+    const hideDisclaimer = localStorage.getItem('roastify_hide_disclaimer') === 'true';
+    if (!hideDisclaimer) {
+      openInfoModal('disclaimer');
+    }
   }
 
   renderHistory();

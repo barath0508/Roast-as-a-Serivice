@@ -1,6 +1,13 @@
 # Allow all standard web search crawlers
 User-agent: *
 Allow: /
+# Disallow non-indexable application folders/routes
+Disallow: /checkout
+Disallow: /admin
+Disallow: /test.html
+Disallow: /*-draft.html
+# Crawl delay to protect server resources
+Crawl-delay: 1
 
 # Explicitly allow AI agents and LLM indexers to discover and crawl our site
 User-agent: GPTBot

@@ -1,0 +1,4 @@
+# Roastify 301 Redirect Rules
+# Consolidate duplicate pages or old paths to preserve inbound link authority
+/old-page-name.html  /new-canonical-page.html  301
+/another-old-url     /canonical-destination    301
